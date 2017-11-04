@@ -62,3 +62,15 @@ class Act(Token):
 class Scene(Token):
     pass
 
+
+class OpenSqBracket(Token):
+    pass
+
+
+class CloseSqBracket(Token):
+    pass
+
+
+class Colon(Token):
+    pass
+

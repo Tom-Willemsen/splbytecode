@@ -12,6 +12,8 @@ class Parser(object):
         self.current_token = None
         self.next_token()
 
+        self.vars_table = {}  # Dictionary of "variable_name": initial_value
+
     def next_token(self):
         self.current_token = next(self.tokens, None)
         return self.current_token
@@ -53,7 +55,49 @@ class Parser(object):
         name = self.eat(tokens.Name)
         self.eat(tokens.Comma)
         value = self.expr()
-        return name, value
+
+        if name in self.vars_table:
+            raise SPLSyntaxError("Redeclaring variables is not allowed ('{}').".format(name))
+        self.vars_table[name] = value
+
+    def act(self):
+        self.eat(tokens.Act)
+        while not isinstance(self.current_token, tokens.FullStop):
+            self.next_token()
+        self.eat(tokens.FullStop)
+
+        self.scene()
+        while not isinstance(self.current_token, tokens.Eof) and not isinstance(self.current_token, tokens.Act):
+            self.scene()
+
+    def scene(self):
+        self.eat(tokens.Scene)
+        while not isinstance(self.current_token, tokens.FullStop):
+            self.next_token()
+        self.eat(tokens.FullStop)
+
+        while not isinstance(self.current_token, tokens.Eof) \
+                and not isinstance(self.current_token, tokens.Act)\
+                and not isinstance(self.current_token, tokens.Scene):
+            self.statement()
+
+    def statement(self):
+        if isinstance(self.current_token, tokens.OpenSqBracket):
+            self.stagecontrol()
+        else:
+            self.speech()
+
+    def stagecontrol(self):
+        self.eat(tokens.OpenSqBracket)
+        self.eat(tokens.CloseSqBracket)
+
+    def speech(self):
+        name = self.eat(tokens.Name)
+        self.eat(tokens.Colon)
+
+        while not isinstance(self.current_token, tokens.FullStop):
+            self.next_token()
+        self.eat(tokens.FullStop)
 
     def play(self):
         # Ignore everything up to and including the first full stop.
@@ -61,11 +105,12 @@ class Parser(object):
             self.next_token()
         self.next_token()
 
-        var_initializations = []
         while not isinstance(self.current_token, tokens.Act):
-            var_initializations.append(self.var_assignment())
+            self.var_assignment()
 
-        self.eat(tokens.Act)
-        self.eat(tokens.Eof)
+        self.act()
 
-        return var_initializations
+        while not isinstance(self.current_token, tokens.Eof):
+            self.act()
+
+        return self.vars_table

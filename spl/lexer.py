@@ -64,6 +64,18 @@ class Lexer(object):
             self.pos += 1
             return tokens.Comma()
 
+        if self.text_starts_with_item("[")[0]:
+            self.pos += 1
+            return tokens.OpenSqBracket()
+
+        if self.text_starts_with_item("]")[0]:
+            self.pos += 1
+            return tokens.CloseSqBracket()
+
+        if self.text_starts_with_item(":")[0]:
+            self.pos += 1
+            return tokens.Colon()
+
         self.pos += 1
         return tokens.Noop()
 
@@ -77,16 +89,3 @@ class Lexer(object):
         if self.text[self.pos:].startswith(item):
             return True, item
         return False, None
-
-
-if __name__ == "__main__":
-    token_generator = list(Lexer(open("expr.spl").read()).token_generator())
-
-    current_token_value = None
-
-    for token in token_generator:
-
-        if isinstance(token, tokens.Noop):
-            continue
-
-        print(token)
