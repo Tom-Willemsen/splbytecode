@@ -1,5 +1,6 @@
 from spl import tokens
 from spl.lexer import Lexer
+from spl.tokens import Token, TokenTypes
 
 
 class SPLSyntaxError(Exception):
@@ -18,25 +19,24 @@ class Parser(object):
         self.current_token = next(self.tokens, None)
         return self.current_token
 
-    def eat(self, token_class):
-        assert isinstance(self.current_token, tokens.Token)
-        if isinstance(self.current_token, token_class):
+    def eat(self, token_type):
+        if self.current_token.type == token_type:
             value = self.current_token.value
             self.next_token()
             return value
         else:
             raise SPLSyntaxError("Unexpected token {} (expected {})."
-                                 .format(str(self.current_token), token_class.__name__))
+                                 .format(str(self.current_token), token_type))
 
     def noun(self):
-        return self.eat(tokens.Noun)
+        return self.eat(TokenTypes.Noun)
 
     def adjective(self):
-        return self.eat(tokens.Adj)
+        return self.eat(TokenTypes.Adj)
 
     def term(self):
         result = 1
-        while isinstance(self.current_token, tokens.Adj):
+        while self.current_token.type == TokenTypes.Adj:
             result *= self.adjective()
         result *= self.noun()
         return result
@@ -44,16 +44,16 @@ class Parser(object):
     def expr(self):
         result = self.term()
 
-        while isinstance(self.current_token, tokens.Add):
-            self.eat(tokens.Add)
+        while self.current_token.type == TokenTypes.Add:
+            self.eat(TokenTypes.Add)
             result += self.term()
 
-        self.eat(tokens.FullStop)
+        self.eat(TokenTypes.FullStop)
         return result
 
     def var_assignment(self):
-        name = self.eat(tokens.Name)
-        self.eat(tokens.Comma)
+        name = self.eat(TokenTypes.Name)
+        self.eat(TokenTypes.Comma)
         value = self.expr()
 
         if name in self.vars_table:
@@ -61,56 +61,56 @@ class Parser(object):
         self.vars_table[name] = value
 
     def act(self):
-        self.eat(tokens.Act)
-        while not isinstance(self.current_token, tokens.FullStop):
+        self.eat(TokenTypes.Act)
+        while self.current_token.type != TokenTypes.FullStop:
             self.next_token()
-        self.eat(tokens.FullStop)
+        self.eat(TokenTypes.FullStop)
 
         self.scene()
-        while not isinstance(self.current_token, tokens.Eof) and not isinstance(self.current_token, tokens.Act):
+        while self.current_token.type != TokenTypes.Eof and self.current_token.type != TokenTypes.Act:
             self.scene()
 
     def scene(self):
-        self.eat(tokens.Scene)
-        while not isinstance(self.current_token, tokens.FullStop):
+        self.eat(TokenTypes.Scene)
+        while self.current_token.type != TokenTypes.FullStop:
             self.next_token()
-        self.eat(tokens.FullStop)
+        self.eat(TokenTypes.FullStop)
 
-        while not isinstance(self.current_token, tokens.Eof) \
-                and not isinstance(self.current_token, tokens.Act)\
-                and not isinstance(self.current_token, tokens.Scene):
+        while self.current_token.type != TokenTypes.Eof \
+                and self.current_token.type != TokenTypes.Act\
+                and self.current_token.type != TokenTypes.Scene:
             self.statement()
 
     def statement(self):
-        if isinstance(self.current_token, tokens.OpenSqBracket):
+        if self.current_token.type == TokenTypes.OpenSqBracket:
             self.stagecontrol()
         else:
             self.speech()
 
     def stagecontrol(self):
-        self.eat(tokens.OpenSqBracket)
-        self.eat(tokens.CloseSqBracket)
+        self.eat(TokenTypes.OpenSqBracket)
+        self.eat(TokenTypes.CloseSqBracket)
 
     def speech(self):
-        name = self.eat(tokens.Name)
-        self.eat(tokens.Colon)
+        name = self.eat(TokenTypes.Name)
+        self.eat(TokenTypes.Colon)
 
-        while not isinstance(self.current_token, tokens.FullStop):
+        while self.current_token.type != TokenTypes.FullStop:
             self.next_token()
-        self.eat(tokens.FullStop)
+        self.eat(TokenTypes.FullStop)
 
     def play(self):
         # Ignore everything up to and including the first full stop.
-        while not isinstance(self.current_token, tokens.FullStop):
+        while self.current_token.type != TokenTypes.FullStop:
             self.next_token()
         self.next_token()
 
-        while not isinstance(self.current_token, tokens.Act):
+        while self.current_token.type != TokenTypes.Act:
             self.var_assignment()
 
         self.act()
 
-        while not isinstance(self.current_token, tokens.Eof):
+        while self.current_token.type != TokenTypes.Eof:
             self.act()
 
         return self.vars_table

@@ -1,9 +1,10 @@
 class Token(object):
-    def __init__(self, value=None):
+    def __init__(self, type, value=None):
+        self.type = type
         self.value = value
 
     def __str__(self):
-        result = repr(self.__class__.__name__)
+        result = "{}".format(self.type)
         if self.value is not None:
             result += ": " + str(self.value)
         return result
@@ -11,66 +12,21 @@ class Token(object):
     def __repr__(self):
         return str(self)
 
-
-class Noun(Token):
-    pass
-
-
-class NiceNoun(Noun):
-    def __init__(self):
-        super().__init__(1)
+    def __eq__(self, other):
+        return self.type == other.type
 
 
-class BadNoun(Noun):
-    def __init__(self):
-        super().__init__(-1)
-
-
-class Noop(Token):
-    pass
-
-
-class Adj(Token):
-    def __init__(self):
-        super().__init__(2)
-
-
-class FullStop(Token):
-    pass
-
-
-class Eof(Token):
-    pass
-
-
-class Add(Token):
-    pass
-
-
-class Comma(Token):
-    pass
-
-
-class Name(Token):
-    pass
-
-
-class Act(Token):
-    pass
-
-
-class Scene(Token):
-    pass
-
-
-class OpenSqBracket(Token):
-    pass
-
-
-class CloseSqBracket(Token):
-    pass
-
-
-class Colon(Token):
-    pass
-
+class TokenTypes(object):
+    Adj = "Adj"
+    NoOp = "NoOp"
+    Eof = "Eof"
+    Scene = "Scene"
+    Act = "Act"
+    Name = "Name"
+    Noun = "Noun"
+    Add = "Add"
+    FullStop = "."
+    Comma = ","
+    Colon = ":"
+    OpenSqBracket = "["
+    CloseSqBracket = "]"

@@ -1,4 +1,4 @@
-from spl import tokens
+from spl.tokens import Token, TokenTypes
 
 
 class Lexer(object):
@@ -9,9 +9,9 @@ class Lexer(object):
     def token_generator(self):
         while self.pos < len(self.text):
             token = self.get_next_token()
-            if not isinstance(token, tokens.Noop):
+            if token.type is not TokenTypes.NoOp:
                 yield token
-        yield tokens.Eof()
+        yield Token(TokenTypes.Eof)
 
     def get_next_token(self):
 
@@ -19,65 +19,65 @@ class Lexer(object):
         found, text = self.text_starts_with_item("act")
         if found:
             self.pos += len(text)
-            return tokens.Act()
+            return Token(TokenTypes.Act)
 
-        # Act
+        # Scene
         found, text = self.text_starts_with_item("scene")
         if found:
             self.pos += len(text)
-            return tokens.Scene()
+            return Token(TokenTypes.Scene)
 
 
         # Names
         found, text = self.text_starts_with_any_of(["romeo", "juliet", "the ghost"])
         if found:
             self.pos += len(text)
-            return tokens.Name(text)
+            return Token(TokenTypes.Name, text)
 
         # Nouns
         found, text = self.text_starts_with_any_of(["man", "patience"])
         if found:
             self.pos += len(text)
-            return tokens.NiceNoun()
+            return Token(TokenTypes.Noun, 1)
 
         found, text = self.text_starts_with_any_of(["pig"])
         if found:
             self.pos += len(text)
-            return tokens.BadNoun()
+            return Token(TokenTypes.Noun, -1)
 
         # Adjectives
         found, text = self.text_starts_with_any_of(["young", "remarkable"])
         if found:
             self.pos += len(text)
-            return tokens.Adj()
+            return Token(TokenTypes.Adj, 2)
 
         found, text = self.text_starts_with_any_of(["with", "and"])
         if found:
             self.pos += len(text)
-            return tokens.Add()
+            return Token(TokenTypes.Add)
 
         if self.text_starts_with_item(".")[0]:
             self.pos += 1
-            return tokens.FullStop()
+            return Token(TokenTypes.FullStop)
 
         if self.text_starts_with_item(",")[0]:
             self.pos += 1
-            return tokens.Comma()
+            return Token(TokenTypes.Comma)
 
         if self.text_starts_with_item("[")[0]:
             self.pos += 1
-            return tokens.OpenSqBracket()
+            return Token(TokenTypes.OpenSqBracket)
 
         if self.text_starts_with_item("]")[0]:
             self.pos += 1
-            return tokens.CloseSqBracket()
+            return Token(TokenTypes.CloseSqBracket)
 
         if self.text_starts_with_item(":")[0]:
             self.pos += 1
-            return tokens.Colon()
+            return Token(TokenTypes.Colon)
 
         self.pos += 1
-        return tokens.Noop()
+        return Token(TokenTypes.NoOp)
 
     def text_starts_with_any_of(self, ls):
         for item in ls:
