@@ -1,6 +1,6 @@
-from spl import tokens
+from spl.ast import DynamicAssign
 from spl.lexer import Lexer
-from spl.tokens import Token, TokenTypes
+from spl.tokens import TokenTypes
 
 
 class SPLSyntaxError(Exception):
@@ -14,6 +14,7 @@ class Parser(object):
         self.next_token()
 
         self.vars_table = {}  # Dictionary of "variable_name": initial_value
+        self.statements = []  # List of statements to be executed
 
     def next_token(self):
         self.current_token = next(self.tokens, None)
@@ -93,11 +94,18 @@ class Parser(object):
 
     def speech(self):
         name = self.eat(TokenTypes.Name)
+        if name not in self.vars_table:
+            raise SPLSyntaxError("Cannot reference an undeclared character ('{}')".format(name))
+
         self.eat(TokenTypes.Colon)
 
-        while self.current_token.type != TokenTypes.FullStop:
-            self.next_token()
-        self.eat(TokenTypes.FullStop)
+        spoken_to = self.eat(TokenTypes.Name)
+        if spoken_to not in self.vars_table:
+            raise SPLSyntaxError("Cannot reference an undeclared character ('{}')".format(name))
+
+        expr_tree = self.expr()
+
+        self.statements.append(DynamicAssign(spoken_to, expr_tree))
 
     def play(self):
         # Ignore everything up to and including the first full stop.
