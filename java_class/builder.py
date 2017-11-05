@@ -1,8 +1,6 @@
-from java_class import access_modifiers
-from java_class.attributes.code import CodeSpecification
-from java_class.instructions import instructions
-from java_class.methods.method_table import MethodSpecification
-from java_class.java_class import JavaClass
+from java_class import access_modifiers, instructions
+from java_class.code import CodeSpecification
+from java_class.java_class import JavaClass, MethodSpecification
 from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable
 
 
@@ -17,8 +15,6 @@ class Builder(object):
     def __init__(self, name):
         self.name = name
         self.output_class = JavaClass(name)
-        self.pool_table = self.output_class.pool_table
-        self.field_table = self.output_class.field_table
         self.code_specification = CodeSpecification([], 32768, 32768)
 
     def build(self):
@@ -29,7 +25,7 @@ class Builder(object):
         main_method = MethodSpecification("main", "([Ljava/lang/String;)V",
                                           access_modifiers.PUBLIC | access_modifiers.STATIC, self.code_specification)
         self.code_specification.instructions.append(instructions.voidreturn())
-        self.output_class.method_table.add_method(main_method)
+        self.output_class.add_method(main_method)
 
         return self.output_class
 
@@ -44,8 +40,8 @@ class Builder(object):
         """
         Sets a field to have the value at the top of the stack.
         """
-        self.field_table.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
-        field_ref = self.pool_table.add_field_ref(self.name, name, "I")
+        self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
+        field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
         self.code_specification.instructions.extend([
             instructions.putstatic(field_ref),
@@ -57,8 +53,8 @@ class Builder(object):
 
         Formats as a character if as_char is True, otherwise formats as an integer.
         """
-        printstream = self.pool_table.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
-        sysout = self.pool_table.add_method_ref("java/io/PrintStream", "println", "(C)V" if as_char else "(I)V")
+        printstream = self.output_class.pool.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
+        sysout = self.output_class.pool.add_method_ref("java/io/PrintStream", "println", "(C)V" if as_char else "(I)V")
 
         self.code_specification.instructions.extend([
             instructions.getstatic(printstream),
@@ -77,8 +73,8 @@ class Builder(object):
         ])
 
     def push_field_value_onto_stack(self, name):
-        self.field_table.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
-        field_ref = self.pool_table.add_field_ref(self.name, name, "I")
+        self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
+        field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
         self.code_specification.instructions.append(instructions.getstatic(field_ref))
 

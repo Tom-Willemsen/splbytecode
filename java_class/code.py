@@ -1,4 +1,4 @@
-from java_class.constant_pool.entry import utf8
+from java_class.constant_pool_entry import utf8
 
 
 class CodeAttribute(object):

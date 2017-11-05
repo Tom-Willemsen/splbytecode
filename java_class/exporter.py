@@ -34,23 +34,23 @@ class Exporter(object):
         stream.write(u2(self.output_class.version[0]))
 
         # Pool table
-        stream.write(u2(len(self.output_class.pool_table) + 1))
-        for entry in self.output_class.pool_table:
+        stream.write(u2(len(self.output_class.pool) + 1))
+        for entry in self.output_class.pool:
             stream.write(entry)
 
         # Access modifiers
         stream.write(u2(reduce(operator.xor, self.output_class.access_modifiers)))
 
         # "This" and "Super" classes
-        stream.write(u2(self.output_class.pool_table.this_index))
-        stream.write(u2(self.output_class.pool_table.super_index))
+        stream.write(u2(self.output_class.pool.this_index))
+        stream.write(u2(self.output_class.pool.super_index))
 
         # Interface table (not implemented)
         stream.write(u2(0))
 
         # Field table
-        stream.write(u2(len(self.output_class.field_table)))
-        for field in self.output_class.field_table:
+        stream.write(u2(len(self.output_class.fields)))
+        for field in self.output_class.fields:
             stream.write(u2(field.access_flags))
             stream.write(u2(field.name_index))
             stream.write(u2(field.descriptor_index))
@@ -61,8 +61,8 @@ class Exporter(object):
                 raise NotImplementedError("Writing fields with attributes is not supported.")
 
         # Methods table
-        stream.write(u2(len(self.output_class.method_table)))
-        for method in self.output_class.method_table:
+        stream.write(u2(len(self.output_class.methods)))
+        for method in self.output_class.methods:
             stream.write(u2(method.access_flags))
             stream.write(u2(method.name_index))
             stream.write(u2(method.descriptor_index))

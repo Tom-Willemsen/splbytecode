@@ -1,4 +1,4 @@
-from java_class.constant_pool.entry import utf8, class_ref, name_and_type, method_ref, field_ref
+from java_class.constant_pool_entry import utf8, class_ref, name_and_type, method_ref, field_ref
 
 
 class ConstantPool(object):
@@ -57,5 +57,5 @@ class ConstantPool(object):
 
         pool.super_utf8_index = pool.get_index(utf8(super_class))
         pool.super_index = pool.get_index(class_ref(pool.super_utf8_index))
-        
+
         return pool
