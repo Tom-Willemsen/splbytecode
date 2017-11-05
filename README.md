@@ -18,5 +18,6 @@ Current deficiencies:
 - Each scene must have a well-defined set of characters on stage. All characters must leave at the end of a scene.
 - Characters are single-valued, stacks have not been implemented.
 - Arithmetic isn't supported yet (e.g. `You are the quotient of ... and ...`)
+- Each character can only say one line at a time.
 
 But seriously, if you're trying to compile SPL to Java bytecode, you have far bigger problems than the above deficiencies.
