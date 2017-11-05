@@ -123,3 +123,11 @@ class GetField(AbstractInstruction):
 
     def __len__(self):
         return 3
+
+
+class I2c(AbstractInstruction):
+    def get_bytes(self):
+        return u1(0x92)
+
+    def __len__(self):
+        return 1
