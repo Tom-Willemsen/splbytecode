@@ -24,12 +24,10 @@ class JavaClass(object):
 
         attributes = [{
             "code_attribute_index": self.pool.get_index(utf8("Code")),
-            "max_stack": 32768,
-            "max_locals": 32768,
             "instructions": instructions,
             "code_length": sum(len(instruction) for instruction in instructions),
-            "exception_table_length": 0,
-            "attributes_count": 0,
+            "max_locals": 32768,
+            "max_stack": 32768,
         }]
 
         name_index = self.pool.get_index(utf8(name))

@@ -29,9 +29,7 @@ if __name__ == "__main__":
 
     try:
         cls_builder = Builder(args.output_class)
-        for var in var_initializations:
-            cls_builder.set_field(var, 0)
-
+        
         for statement in statements:
             cls_builder.ast_dump(statement)
 

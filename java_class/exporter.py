@@ -77,8 +77,8 @@ class Exporter(object):
                 stream.write(u4(attribute["code_length"]))
                 for instruction in attribute["instructions"]:
                     stream.write(instruction)
-                stream.write(u2(attribute["exception_table_length"]))
-                stream.write(u2(attribute["attributes_count"]))
+                stream.write(u2(0))  # Exception table not implemented
+                stream.write(u2(0))  # Attributes of attributes not implemented
 
         # Attributes table (not implemented)
         stream.write(u2(0))
