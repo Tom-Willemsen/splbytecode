@@ -27,21 +27,7 @@ class Builder(object):
     def build(self):
         """
         This methods performs final transformations before export.
-
-        Notably it deals with the semantics of ensuring the various tables can index against each other.
         """
-
-        # self.set_field("romeo", 12)
-        # self.set_field("juliet", 34)
-        # self.push_field_value_onto_stack("romeo")
-        # self.push_field_value_onto_stack("juliet")
-        # self.code_specification.instructions.extend([
-        #     instructions.Imul()
-        # ])
-        # self.set_field_with_value_from_top_of_stack("result")
-        # self.print_integer_field("romeo")
-        # self.print_integer_field("juliet")
-        # self.print_integer_field("result")
 
         main_method = MethodSpecification("main", "([Ljava/lang/String;)V",
                                           ACC_METHOD.PUBLIC | ACC_METHOD.STATIC, self.code_specification)
@@ -122,6 +108,3 @@ class Builder(object):
             self.set_field_with_value_from_top_of_stack(tree.var)
         else:
             raise CompilationError("Unknown type of AST node {}".format(tree))
-
-if __name__ == "__main__":
-    Exporter(Builder("SplProgram").build()).export_as_file(os.path.join("D:\\", "Documents", "JavaProjects"))

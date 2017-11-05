@@ -56,9 +56,10 @@ class Lexer(object):
             self.pos += len(text)
             return Token(TokenTypes.Add, value=Operators.ADD)
 
-        if self.text_starts_with_item(".")[0]:
-            self.pos += 1
-            return Token(TokenTypes.FullStop)
+        found, text = self.text_starts_with_any_of([".", "!"])
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.EndLine)
 
         if self.text_starts_with_item(",")[0]:
             self.pos += 1
@@ -75,6 +76,36 @@ class Lexer(object):
         if self.text_starts_with_item(":")[0]:
             self.pos += 1
             return Token(TokenTypes.Colon)
+
+        # Second person pronouns
+        found, text = self.text_starts_with_any_of(["you"])
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.SecondPronoun)
+
+        # First person pronouns
+        found, text = self.text_starts_with_any_of(["I", "myself"])
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.FirstPronoun)
+
+        # enter
+        found, text = self.text_starts_with_item("enter")
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Enter)
+
+        # exit
+        found, text = self.text_starts_with_item("exit")
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Exit)
+
+        # exeunt
+        found, text = self.text_starts_with_item("exeunt")
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Exeunt)
 
         self.pos += 1
         return Token(TokenTypes.NoOp)
