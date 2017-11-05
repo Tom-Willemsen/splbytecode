@@ -1,8 +1,5 @@
-import os
-
-from java_class.access_modifiers import ACC_METHOD, ACC_FIELD
+from java_class import access_modifiers
 from java_class.attributes.code import CodeSpecification
-from java_class.exporter import Exporter
 from java_class.instructions import instructions
 from java_class.methods.method_table import MethodSpecification
 from java_class.java_class import JavaClass
@@ -30,7 +27,7 @@ class Builder(object):
         """
 
         main_method = MethodSpecification("main", "([Ljava/lang/String;)V",
-                                          ACC_METHOD.PUBLIC | ACC_METHOD.STATIC, self.code_specification)
+                                          access_modifiers.PUBLIC | access_modifiers.STATIC, self.code_specification)
         self.code_specification.instructions.append(instructions.voidreturn())
         self.output_class.method_table.add_method(main_method)
 
@@ -47,7 +44,7 @@ class Builder(object):
         """
         Sets a field to have the value at the top of the stack.
         """
-        self.field_table.add_field(name, "I", ACC_FIELD.PUBLIC | ACC_FIELD.STATIC)
+        self.field_table.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
         field_ref = self.pool_table.add_field_ref(self.name, name, "I")
 
         self.code_specification.instructions.extend([
@@ -80,7 +77,7 @@ class Builder(object):
         ])
 
     def push_field_value_onto_stack(self, name):
-        self.field_table.add_field(name, "I", ACC_FIELD.PUBLIC | ACC_FIELD.STATIC)
+        self.field_table.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
         field_ref = self.pool_table.add_field_ref(self.name, name, "I")
 
         self.code_specification.instructions.append(instructions.getstatic(field_ref))

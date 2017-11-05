@@ -1,4 +1,4 @@
-from java_class.access_modifiers import ACC_CLASS
+from java_class import access_modifiers
 from java_class.constant_pool.constant_pool import ConstantPool
 from java_class.fields.field_table import FieldTable
 from java_class.methods.method_table import MethodTable
@@ -17,7 +17,7 @@ class JavaClass(object):
             self.method_table = MethodTable(self.pool_table)
             self.field_table = FieldTable(self.pool_table)
 
-            self.access_modifiers = [ACC_CLASS.PUBLIC, ACC_CLASS.SUPER]
+            self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
             self.version = (0x35, 0)  # JDK 9 by default
 
     def check_valid(self):

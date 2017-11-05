@@ -19,20 +19,20 @@ def str_to_byte(text):
 
 def u1(i, signed=False):
     """
-    Java java_class file u1 type
+    Java class file u1 type
     """
     return int(i).to_bytes(1, 'big', signed=signed)
 
 
 def u2(i, signed=False):
     """
-    Java java_class file u2 type
+    Java class file u2 type
     """
     return int(i).to_bytes(2, 'big', signed=signed)
 
 
 def u4(i, signed=False):
     """
-    Java java_class file u4 type
+    Java class file u4 type
     """
     return int(i).to_bytes(4, 'big', signed=signed)
