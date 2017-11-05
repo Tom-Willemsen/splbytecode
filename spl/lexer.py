@@ -1,3 +1,4 @@
+from spl.ast import Operators
 from spl.tokens import Token, TokenTypes
 
 
@@ -27,7 +28,6 @@ class Lexer(object):
             self.pos += len(text)
             return Token(TokenTypes.Scene)
 
-
         # Names
         found, text = self.text_starts_with_any_of(["romeo", "juliet", "the ghost"])
         if found:
@@ -54,7 +54,7 @@ class Lexer(object):
         found, text = self.text_starts_with_any_of(["with", "and"])
         if found:
             self.pos += len(text)
-            return Token(TokenTypes.Add)
+            return Token(TokenTypes.Add, value=Operators.ADD)
 
         if self.text_starts_with_item(".")[0]:
             self.pos += 1

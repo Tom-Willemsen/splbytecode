@@ -1,4 +1,4 @@
-from spl.ast import DynamicAssign
+from spl.ast import Assign, Operators, BinaryOperator, Value
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -13,7 +13,7 @@ class Parser(object):
         self.current_token = None
         self.next_token()
 
-        self.vars_table = {}  # Dictionary of "variable_name": initial_value
+        self.vars_table = []  # List of variable names declared.
         self.statements = []  # List of statements to be executed
 
     def next_token(self):
@@ -36,21 +36,20 @@ class Parser(object):
         return self.eat(TokenTypes.Adj)
 
     def term(self):
-        result = 1
-        while self.current_token.type == TokenTypes.Adj:
-            result *= self.adjective()
-        result *= self.noun()
-        return result
+        if self.current_token.type == TokenTypes.Adj:
+            return BinaryOperator(Value(self.eat(TokenTypes.Adj)), Operators.MULTIPLY, self.term())
+        elif self.current_token.type == TokenTypes.Name:
+            return Value(self.eat(TokenTypes.Name))
+        else:
+            return Value(self.eat(TokenTypes.Noun))
 
     def expr(self):
-        result = self.term()
-
-        while self.current_token.type == TokenTypes.Add:
-            self.eat(TokenTypes.Add)
-            result += self.term()
-
-        self.eat(TokenTypes.FullStop)
-        return result
+        left = self.term()
+        if self.current_token.type == TokenTypes.Add:
+            return BinaryOperator(left, self.eat(TokenTypes.Add), self.expr())
+        else:
+            self.eat(TokenTypes.FullStop)
+            return left
 
     def var_assignment(self):
         name = self.eat(TokenTypes.Name)
@@ -59,7 +58,8 @@ class Parser(object):
 
         if name in self.vars_table:
             raise SPLSyntaxError("Redeclaring variables is not allowed ('{}').".format(name))
-        self.vars_table[name] = value
+        self.vars_table.append(name)
+        self.statements.append(Assign(name, value, dynamic=False))
 
     def act(self):
         self.eat(TokenTypes.Act)
@@ -105,7 +105,7 @@ class Parser(object):
 
         expr_tree = self.expr()
 
-        self.statements.append(DynamicAssign(spoken_to, expr_tree))
+        self.statements.append(Assign(spoken_to, expr_tree))
 
     def play(self):
         # Ignore everything up to and including the first full stop.
@@ -121,4 +121,4 @@ class Parser(object):
         while self.current_token.type != TokenTypes.Eof:
             self.act()
 
-        return self.vars_table
+        return self.vars_table, self.statements

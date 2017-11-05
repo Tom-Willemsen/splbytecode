@@ -6,6 +6,11 @@ from java_class.exporter import Exporter
 from java_class.instructions import instructions
 from java_class.methods.method_table import MethodSpecification
 from java_class.java_class import JavaClass
+from spl.ast import BinaryOperator, Operators, Value, Assign
+
+
+class CompilationError(Exception):
+    pass
 
 
 class Builder(object):
@@ -96,6 +101,25 @@ class Builder(object):
         self.push_field_value_onto_stack(name)
         self.integer_at_top_of_stack_to_sysout()
 
+    def ast_dump(self, tree):
+        for node in tree.get_children():
+            self.ast_dump(node)
+
+        if isinstance(tree, BinaryOperator):
+            operator_mapping = {
+                Operators.ADD: instructions.Iadd(),
+                Operators.MULTIPLY: instructions.Imul(),
+            }
+            try:
+                self.code_specification.instructions.append(operator_mapping[tree.op])
+            except KeyError:
+                raise CompilationError("No instruction specified to map {}".format(tree.op))
+        elif isinstance(tree, Value):
+            self.code_specification.instructions.append(instructions.Bipush(tree.value))
+        elif isinstance(tree, Assign):
+            self.set_field_with_value_from_top_of_stack(tree.var)
+        else:
+            raise CompilationError("Unknown type of AST node {}".format(tree))
 
 if __name__ == "__main__":
     Exporter(Builder("SplProgram").build()).export_as_file(os.path.join("D:\\", "Documents", "JavaProjects"))

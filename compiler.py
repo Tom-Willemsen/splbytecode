@@ -18,15 +18,22 @@ if __name__ == "__main__":
 
     spl_parser = Parser(args.input)
     try:
-        var_initializations = result = spl_parser.play()
+        var_initializations, statements = spl_parser.play()
     except SPLSyntaxError as e:
         print("Syntax error: {}".format(e))
         sys.exit(1)
 
     cls_builder = Builder(args.output_class)
-    for var, value in var_initializations.items():
-        cls_builder.set_field(var, value)
+    for var in var_initializations:
+        cls_builder.set_field(var, 0)
+
+    for statement in statements:
+        # print(statement)
+        cls_builder.ast_dump(statement)
+
+    for var in var_initializations:
         cls_builder.print_integer_field(var)
+
     cls = cls_builder.build()
 
     Exporter(cls).export_as_file(args.output_dir)
