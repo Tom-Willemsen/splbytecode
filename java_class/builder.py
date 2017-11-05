@@ -1,5 +1,5 @@
 from java_class import access_modifiers, instructions
-from java_class.java_class import JavaClass, CodeAttribute
+from java_class.java_class import JavaClass
 from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable
 
 
@@ -22,8 +22,7 @@ class Builder(object):
         """
         self.main_method_instructions.append(instructions.voidreturn())
         self.output_class.add_method("main", "([Ljava/lang/String;)V",
-                                     access_modifiers.PUBLIC | access_modifiers.STATIC,
-                                     [CodeAttribute(self.output_class.pool, self.main_method_instructions)])
+                                     access_modifiers.PUBLIC | access_modifiers.STATIC, self.main_method_instructions)
 
         return self.output_class
 

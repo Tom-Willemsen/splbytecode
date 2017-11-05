@@ -68,17 +68,17 @@ class Exporter(object):
             stream.write(u2(descriptor_index))
             stream.write(u2(len(attributes)))
 
-            # Attributes table within method table
+            # Attributes table within method table (e.g. contains "Code" attribute)
             for attribute in attributes:
-                stream.write(u2(attribute.code_attribute_index))
-                stream.write(u4(12 + attribute.code_length))
-                stream.write(u2(attribute.max_stack))
-                stream.write(u2(attribute.max_locals))
-                stream.write(u4(attribute.code_length))
-                for instruction in attribute.instructions:
+                stream.write(u2(attribute["code_attribute_index"]))
+                stream.write(u4(12 + attribute["code_length"]))
+                stream.write(u2(attribute["max_stack"]))
+                stream.write(u2(attribute["max_locals"]))
+                stream.write(u4(attribute["code_length"]))
+                for instruction in attribute["instructions"]:
                     stream.write(instruction)
-                stream.write(u2(attribute.exception_table_length))
-                stream.write(u2(attribute.attributes_count))
+                stream.write(u2(attribute["exception_table_length"]))
+                stream.write(u2(attribute["attributes_count"]))
 
         # Attributes table (not implemented)
         stream.write(u2(0))

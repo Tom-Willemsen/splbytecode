@@ -20,7 +20,17 @@ class JavaClass(object):
             self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
             self.version = (0x35, 0)  # JDK 9 by default
 
-    def add_method(self, name, descriptor, access_flags, attributes):
+    def add_method(self, name, descriptor, access_flags, instructions):
+
+        attributes = [{
+            "code_attribute_index": self.pool.get_index(utf8("Code")),
+            "max_stack": 32768,
+            "max_locals": 32768,
+            "instructions": instructions,
+            "code_length": sum(len(instruction) for instruction in instructions),
+            "exception_table_length": 0,
+            "attributes_count": 0,
+        }]
 
         name_index = self.pool.get_index(utf8(name))
         descriptor_index = self.pool.get_index(utf8(descriptor))
@@ -79,20 +89,3 @@ class Field(object):
 
     def __eq__(self, other):
         return self.name_index == other.name_index and self.descriptor_index == other.descriptor_index
-
-
-class CodeAttribute(object):
-    """
-    Class specifying how a CodeAttribute object is outputted to the final .java_class file.
-    """
-    def __init__(self, constant_pool, instructions, max_stack=32768, max_locals=32768):
-        self.code_attribute_index = constant_pool.get_index(utf8("Code"))
-        self.max_stack = max_stack
-        self.max_locals = max_locals
-        self.instructions = instructions
-        self.code_length = sum(len(instruction) for instruction in self.instructions)
-        self.exception_table_length = 0
-        self.attributes_count = 0
-
-    def __len__(self):
-        return self.code_length
