@@ -159,8 +159,8 @@ class Parser(object):
         if self.current_token.type != TokenTypes.Print:
             statement = self.assignment()
         else:
-            self.eat(TokenTypes.Print)
-            statement = PrintVariable(self.get_character_being_spoken_to())
+            as_char = self.eat(TokenTypes.Print)
+            statement = PrintVariable(self.get_character_being_spoken_to(), as_char)
             self.eat(TokenTypes.EndLine)
 
         self.statements.append(statement)

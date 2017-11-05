@@ -44,7 +44,12 @@ class Lexer(object):
         found, text = self.text_starts_with_item("speak your mind")
         if found:
             self.pos += len(text)
-            return Token(TokenTypes.Print)
+            return Token(TokenTypes.Print, True)
+
+        found, text = self.text_starts_with_item("open your heart")
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Print, False)
 
         # Names
         found, text = self.text_starts_with_any_of(self.names)

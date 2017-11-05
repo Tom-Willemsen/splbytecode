@@ -69,6 +69,20 @@ class Builder(object):
             instructions.InvokeVirtual(sysout_integer)
         ])
 
+    def integer_at_top_of_stack_to_sysout_as_char(self):
+        """
+        The integer at the top of the stack is popped and printed to standard out.
+        """
+        printstream = self.pool_table.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
+        sysout_integer = self.pool_table.add_method_ref("java/io/PrintStream", "print", "(C)V")
+
+        self.code_specification.instructions.extend([
+            instructions.GetStatic(printstream),
+            instructions.Swap(),
+            instructions.I2c(),
+            instructions.InvokeVirtual(sysout_integer)
+        ])
+
     def multiply_integer_at_top_of_stack_by_two(self):
         self.code_specification.instructions.extend([
             instructions.Bipush(2),
@@ -83,9 +97,12 @@ class Builder(object):
             instructions.GetStatic(field_ref),
         ])
 
-    def print_integer_field(self, name):
+    def print_field(self, name, as_char):
         self.push_field_value_onto_stack(name)
-        self.integer_at_top_of_stack_to_sysout()
+        if as_char:
+            self.integer_at_top_of_stack_to_sysout_as_char()
+        else:
+            self.integer_at_top_of_stack_to_sysout()
 
     def ast_dump(self, tree):
         for node in tree.get_children():
@@ -109,6 +126,6 @@ class Builder(object):
         elif isinstance(tree, Assign):
             self.set_field_with_value_from_top_of_stack(tree.var)
         elif isinstance(tree, PrintVariable):
-            self.print_integer_field(tree.field)
+            self.print_field(tree.field, tree.as_char)
         else:
             raise CompilationError("Unknown type of AST node {}".format(tree))
