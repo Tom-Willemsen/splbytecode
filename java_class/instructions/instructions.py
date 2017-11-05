@@ -1,133 +1,56 @@
 from java_class.byte_utils import u1, u2
 
 
-class AbstractInstruction(object):
-    def get_bytes(self):
-        raise NotImplementedError
+def voidreturn():
+    return u1(0xB1)
 
 
-class Return(AbstractInstruction):
-    def __init__(self):
-        pass
-
-    def get_bytes(self):
-        return u1(0xB1)
-
-    def __len__(self):
-        return 1
+def getstatic(field_index):
+    return u1(0xB2) \
+           + u2(field_index)
 
 
-class GetStatic(AbstractInstruction):
-    def __init__(self, field_index):
-        self.field_index = field_index
-
-    def get_bytes(self):
-        return u1(0xB2) \
-               + u2(self.field_index)
-
-    def __len__(self):
-        return 3
+def ldc(const_index):
+    return u1(0x12) \
+           + u1(const_index)
 
 
-class Ldc(AbstractInstruction):
-    def __init__(self, const_index):
-        self.const_index = const_index
-
-    def get_bytes(self):
-        return u1(0x12) \
-               + u1(self.const_index)
-
-    def __len__(self):
-        return 2
+def invokevirtual(method):
+    return u1(0xB6) \
+           + u2(method)
 
 
-class InvokeVirtual(AbstractInstruction):
-    def __init__(self, method):
-        self.method = method
-
-    def get_bytes(self):
-        return u1(0xB6) \
-               + u2(self.method)
-
-    def __len__(self):
-        return 3
+def bipush(value):
+    return u1(0x10) \
+            + u1(value, signed=True)
 
 
-class Bipush(AbstractInstruction):
-    def __init__(self, value):
-        self.value = value
-
-    def get_bytes(self):
-        return u1(0x10) \
-                + u1(self.value, signed=True)
-
-    def __len__(self):
-        return 2
+def swap():
+    return u1(0x5F)
 
 
-class Swap(AbstractInstruction):
-    def get_bytes(self):
-        return u1(0x5F)
-
-    def __len__(self):
-        return 1
+def iadd():
+    return u1(0x60)
 
 
-class Iadd(AbstractInstruction):
-    def get_bytes(self):
-        return u1(0x60)
-
-    def __len__(self):
-        return 1
+def imul():
+    return u1(0x68)
 
 
-class Imul(AbstractInstruction):
-    def get_bytes(self):
-        return u1(0x68)
-
-    def __len__(self):
-        return 1
+def putfield(ref):
+    return u1(0xB5) \
+            + u2(ref)
 
 
-class PutField(AbstractInstruction):
-    def __init__(self, ref):
-        self.ref = ref
-
-    def get_bytes(self):
-        return u1(0xB5) \
-                + u2(self.ref)
-
-    def __len__(self):
-        return 3
+def putstatic(ref):
+    return u1(0xB3) \
+            + u2(ref)
 
 
-class PutStatic(AbstractInstruction):
-    def __init__(self, ref):
-        self.ref = ref
-
-    def get_bytes(self):
-        return u1(0xB3) \
-                + u2(self.ref)
-
-    def __len__(self):
-        return 3
+def getfield(ref):
+    return u1(0xB4) \
+            + u2(ref)
 
 
-class GetField(AbstractInstruction):
-    def __init__(self, ref):
-        self.ref = ref
-
-    def get_bytes(self):
-        return u1(0xB4) \
-                + u2(self.ref)
-
-    def __len__(self):
-        return 3
-
-
-class I2c(AbstractInstruction):
-    def get_bytes(self):
-        return u1(0x92)
-
-    def __len__(self):
-        return 1
+def i2c():
+    return u1(0x92)

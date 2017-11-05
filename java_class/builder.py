@@ -31,7 +31,7 @@ class Builder(object):
 
         main_method = MethodSpecification("main", "([Ljava/lang/String;)V",
                                           ACC_METHOD.PUBLIC | ACC_METHOD.STATIC, self.code_specification)
-        self.code_specification.instructions.append(instructions.Return())
+        self.code_specification.instructions.append(instructions.voidreturn())
         self.output_class.method_table.add_method(main_method)
 
         return self.output_class
@@ -41,7 +41,7 @@ class Builder(object):
         Sets a field with a constant value.
         """
         self.code_specification.instructions.extend([
-            instructions.Bipush(value),
+            instructions.bipush(value),
         ])
         self.set_field_with_value_from_top_of_stack(name)
 
@@ -53,7 +53,7 @@ class Builder(object):
         field_ref = self.pool_table.add_field_ref(self.name, name, "I")
 
         self.code_specification.instructions.extend([
-            instructions.PutStatic(field_ref),
+            instructions.putstatic(field_ref),
         ])
 
     def integer_at_top_of_stack_to_sysout(self, as_char):
@@ -66,19 +66,19 @@ class Builder(object):
         sysout = self.pool_table.add_method_ref("java/io/PrintStream", "println", "(C)V" if as_char else "(I)V")
 
         self.code_specification.instructions.extend([
-            instructions.GetStatic(printstream),
-            instructions.Swap(),
+            instructions.getstatic(printstream),
+            instructions.swap(),
         ])
 
         if as_char:
-            self.code_specification.instructions.append(instructions.I2c())
+            self.code_specification.instructions.append(instructions.i2c())
 
-        self.code_specification.instructions.append(instructions.InvokeVirtual(sysout))
+        self.code_specification.instructions.append(instructions.invokevirtual(sysout))
 
     def multiply_integer_at_top_of_stack_by_two(self):
         self.code_specification.instructions.extend([
-            instructions.Bipush(2),
-            instructions.Imul(),
+            instructions.bipush(2),
+            instructions.imul(),
         ])
 
     def push_field_value_onto_stack(self, name):
@@ -86,7 +86,7 @@ class Builder(object):
         field_ref = self.pool_table.add_field_ref(self.name, name, "I")
 
         self.code_specification.instructions.extend([
-            instructions.GetStatic(field_ref),
+            instructions.getstatic(field_ref),
         ])
 
     def print_field(self, name, as_char):
@@ -101,15 +101,15 @@ class Builder(object):
 
         if isinstance(tree, BinaryOperator):
             operator_mapping = {
-                Operators.ADD: instructions.Iadd(),
-                Operators.MULTIPLY: instructions.Imul(),
+                Operators.ADD: instructions.iadd(),
+                Operators.MULTIPLY: instructions.imul(),
             }
             try:
                 self.code_specification.instructions.append(operator_mapping[tree.op])
             except KeyError:
                 raise CompilationError("No instruction specified to map {}".format(tree.op))
         elif isinstance(tree, Value):
-            self.code_specification.instructions.append(instructions.Bipush(tree.value))
+            self.code_specification.instructions.append(instructions.bipush(tree.value))
         elif isinstance(tree, DynamicValue):
             self.push_field_value_onto_stack(tree.field)
         elif isinstance(tree, Assign):

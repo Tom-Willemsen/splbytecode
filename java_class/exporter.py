@@ -76,7 +76,7 @@ class Exporter(object):
                 stream.write(u2(attribute.max_locals))
                 stream.write(u4(attribute.code_length))
                 for instruction in attribute.instructions:
-                    stream.write(instruction.get_bytes())
+                    stream.write(instruction)
                 stream.write(u2(attribute.exception_table_length))
                 stream.write(u2(attribute.attributes_count))
 
