@@ -14,7 +14,6 @@ The resulting `.class` file reports it's version as Java 9 but I suspect if the 
 
 Current deficiencies:
 - Does not support Gotos (yet)
-- Only prints ASCII codes, not characters (yet)
 - Each scene must have a well-defined set of characters on stage. All characters must leave at the end of a scene.
 - Characters are single-valued, stacks have not been implemented.
 - Arithmetic isn't supported yet (e.g. `You are the quotient of ... and ...`)
