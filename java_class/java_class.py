@@ -50,20 +50,25 @@ class JavaClass(object):
         self.fields.append(field)
 
     def check_valid(self):
+        """
+        Checks that the class is in a valid state for export.
+        :return: Tuple of ((bool) is_valid, (str) reason).
+        """
         if self.name is None:
-            raise InvalidClassError("Name should be set.")
+            return False, "Name should be set."
         if self.pool is None:
-            raise InvalidClassError("Pool table was not set.")
+            return False, "Pool table was not set."
         if self.methods is None:
-            raise InvalidClassError("Method table was not set.")
+            return False, "Method table was not set."
         if len(self.methods) == 0:
-            raise InvalidClassError("Method table was empty.")
+            return False, "Method table was empty."
         if self.fields is None:
-            raise InvalidClassError("Field table was not set.")
+            return False, "Field table was not set."
         if self.version is None or len(self.version) != 2:
-            raise InvalidClassError("Version should be a tuple of two items (major, minor).")
+            return False, "Version should be a tuple of two items (major, minor)."
         if self.access_modifiers is None:
-            raise InvalidClassError("Access modifiers not set.")
+            return False, "Access modifiers not set."
+        return True, "OK"
 
 
 class Field(object):

@@ -44,7 +44,7 @@ class ConstantPool(object):
         return self.get_index(field_ref(defining_class_index, name_and_type_index))
 
     @staticmethod
-    def generate_default(this_class="SplProg", super_class="java/lang/Object"):
+    def generate_default(this_class, super_class="java/lang/Object"):
         """
         A convenience method to quickly generate a skeletal constant pool, with "this" and "super" set.
         """

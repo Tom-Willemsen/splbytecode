@@ -24,6 +24,10 @@ class Builder(object):
         self.output_class.add_method("main", "([Ljava/lang/String;)V",
                                      access_modifiers.PUBLIC | access_modifiers.STATIC, self.main_method_instructions)
 
+        valid, message = self.output_class.check_valid()
+        if not valid:
+            raise CompilationError("Can't build class: {}".format(message))
+
         return self.output_class
 
     def set_field(self, name, value):
@@ -70,9 +74,10 @@ class Builder(object):
         ])
 
     def push_field_value_onto_stack(self, name):
+        # Ensures the field exists otherwise getting it will cause a runtime error.
         self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
-        field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
+        field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
         self.main_method_instructions.append(instructions.getstatic(field_ref))
 
     def print_field(self, name, as_char):
