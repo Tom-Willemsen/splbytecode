@@ -6,23 +6,19 @@ def voidreturn():
 
 
 def getstatic(field_index):
-    return u1(0xB2) \
-           + u2(field_index)
+    return u1(0xB2) + u2(field_index)
 
 
 def ldc(const_index):
-    return u1(0x12) \
-           + u1(const_index)
+    return u1(0x12) + u1(const_index)
 
 
 def invokevirtual(method):
-    return u1(0xB6) \
-           + u2(method)
+    return u1(0xB6) + u2(method)
 
 
 def bipush(value):
-    return u1(0x10) \
-            + u1(value, signed=True)
+    return u1(0x10) + u1(value, signed=True)
 
 
 def swap():
@@ -38,18 +34,15 @@ def imul():
 
 
 def putfield(ref):
-    return u1(0xB5) \
-            + u2(ref)
+    return u1(0xB5) + u2(ref)
 
 
 def putstatic(ref):
-    return u1(0xB3) \
-            + u2(ref)
+    return u1(0xB3) + u2(ref)
 
 
 def getfield(ref):
-    return u1(0xB4) \
-            + u2(ref)
+    return u1(0xB4) + u2(ref)
 
 
 def i2c():

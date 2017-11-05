@@ -40,9 +40,7 @@ class Builder(object):
         """
         Sets a field with a constant value.
         """
-        self.code_specification.instructions.extend([
-            instructions.bipush(value),
-        ])
+        self.code_specification.instructions.append(instructions.bipush(value))
         self.set_field_with_value_from_top_of_stack(name)
 
     def set_field_with_value_from_top_of_stack(self, name):
@@ -85,9 +83,7 @@ class Builder(object):
         self.field_table.add_field(name, "I", ACC_FIELD.PUBLIC | ACC_FIELD.STATIC)
         field_ref = self.pool_table.add_field_ref(self.name, name, "I")
 
-        self.code_specification.instructions.extend([
-            instructions.getstatic(field_ref),
-        ])
+        self.code_specification.instructions.append(instructions.getstatic(field_ref))
 
     def print_field(self, name, as_char):
         self.push_field_value_onto_stack(name)
