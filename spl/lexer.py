@@ -7,6 +7,19 @@ class Lexer(object):
         self.text = text.lower()
         self.pos = 0
 
+        self.names = Lexer.list_from_file("spl/words/characters.txt")
+        self.nouns = Lexer.list_from_file("spl/words/nouns.txt")
+        self.negative_nouns = Lexer.list_from_file("spl/words/negative_nouns.txt")
+        self.adjectives = Lexer.list_from_file("spl/words/adjectives.txt")
+
+    @staticmethod
+    def list_from_file(filename):
+        result = []
+        with open(filename, "r") as f:
+            for line in f.readlines():
+                result.append(line.strip().lower())
+        return result
+
     def token_generator(self):
         while self.pos < len(self.text):
             token = self.get_next_token()
@@ -29,24 +42,24 @@ class Lexer(object):
             return Token(TokenTypes.Scene)
 
         # Names
-        found, text = self.text_starts_with_any_of(["romeo", "juliet", "the ghost"])
+        found, text = self.text_starts_with_any_of(self.names)
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Name, text)
 
         # Nouns
-        found, text = self.text_starts_with_any_of(["man", "patience"])
+        found, text = self.text_starts_with_any_of(self.nouns)
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Noun, 1)
 
-        found, text = self.text_starts_with_any_of(["pig"])
+        found, text = self.text_starts_with_any_of(self.negative_nouns)
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Noun, -1)
 
         # Adjectives
-        found, text = self.text_starts_with_any_of(["young", "remarkable"])
+        found, text = self.text_starts_with_any_of(self.adjectives)
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Adj, 2)
@@ -78,7 +91,7 @@ class Lexer(object):
             return Token(TokenTypes.Colon)
 
         # Second person pronouns
-        found, text = self.text_starts_with_any_of(["you"])
+        found, text = self.text_starts_with_any_of(["you", "thyself"])
         if found:
             self.pos += len(text)
             return Token(TokenTypes.SecondPronoun)

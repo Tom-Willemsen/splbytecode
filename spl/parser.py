@@ -44,6 +44,10 @@ class Parser(object):
             return BinaryOperator(Value(self.eat(TokenTypes.Adj)), Operators.MULTIPLY, self.term())
         elif self.current_token.type == TokenTypes.Name:
             return DynamicValue(self.eat(TokenTypes.Name))
+        elif self.current_token.type == TokenTypes.SecondPronoun:
+            return DynamicValue(self.eat(TokenTypes.SecondPronoun))
+        elif self.current_token.type == TokenTypes.FirstPronoun:
+            return DynamicValue(self.eat(TokenTypes.FirstPronoun))
         else:
             return Value(self.eat(TokenTypes.Noun))
 
@@ -53,9 +57,12 @@ class Parser(object):
             return BinaryOperator(left, self.eat(TokenTypes.Add), self.expr())
         elif self.current_token.type == TokenTypes.Adj:
             return BinaryOperator(left, Operators.ADD, self.expr())
-        else:
+        elif self.current_token.type == TokenTypes.EndLine:
             self.eat(TokenTypes.EndLine)
             return left
+        else:
+            op = BinaryOperator(left, Operators.ADD, self.expr())
+            return op
 
     def var_assignment(self):
         name = self.eat(TokenTypes.Name)
