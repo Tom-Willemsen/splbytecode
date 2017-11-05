@@ -36,9 +36,9 @@ if __name__ == "__main__":
 
         for statement in statements:
             cls_builder.ast_dump(statement)
-
-        for var in var_initializations:
-            cls_builder.print_integer_field(var)
+        #
+        # for var in var_initializations:
+        #     cls_builder.print_integer_field(var)
 
         cls = cls_builder.build()
     except CompilationError as e:

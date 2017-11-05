@@ -6,7 +6,7 @@ from java_class.exporter import Exporter
 from java_class.instructions import instructions
 from java_class.methods.method_table import MethodSpecification
 from java_class.java_class import JavaClass
-from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue
+from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable
 
 
 class CompilationError(Exception):
@@ -91,6 +91,8 @@ class Builder(object):
         for node in tree.get_children():
             self.ast_dump(node)
 
+        assert isinstance(tree, AstNode)
+
         if isinstance(tree, BinaryOperator):
             operator_mapping = {
                 Operators.ADD: instructions.Iadd(),
@@ -106,5 +108,7 @@ class Builder(object):
             self.push_field_value_onto_stack(tree.field)
         elif isinstance(tree, Assign):
             self.set_field_with_value_from_top_of_stack(tree.var)
+        elif isinstance(tree, PrintVariable):
+            self.print_integer_field(tree.field)
         else:
             raise CompilationError("Unknown type of AST node {}".format(tree))

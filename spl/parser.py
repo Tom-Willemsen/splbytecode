@@ -1,4 +1,4 @@
-from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue
+from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -18,6 +18,14 @@ class Parser(object):
 
         self.onstage = []  # List of characters currently on stage (for figuring out who "you" is...)
         self.speaking = None  # Character currently speaking
+
+    def get_character_being_spoken_to(self):
+        if len(self.onstage) != 2:
+            raise SPLSyntaxError("There must be exactly 2 characters on stage to speak to someone")
+        assert self.speaking is not None
+        char = list(c for c in self.onstage if c != self.speaking)
+        assert len(char) == 1
+        return char[0]
 
     def next_token(self):
         self.current_token = next(self.tokens, None)
@@ -45,9 +53,11 @@ class Parser(object):
         elif self.current_token.type == TokenTypes.Name:
             return DynamicValue(self.eat(TokenTypes.Name))
         elif self.current_token.type == TokenTypes.SecondPronoun:
-            return DynamicValue(self.eat(TokenTypes.SecondPronoun))
+            self.eat(TokenTypes.SecondPronoun)
+            return DynamicValue(self.get_character_being_spoken_to())
         elif self.current_token.type == TokenTypes.FirstPronoun:
-            return DynamicValue(self.eat(TokenTypes.FirstPronoun))
+            self.eat(TokenTypes.FirstPronoun)
+            return DynamicValue(self.get_character_being_spoken_to())
         else:
             return Value(self.eat(TokenTypes.Noun))
 
@@ -147,26 +157,31 @@ class Parser(object):
 
         self.eat(TokenTypes.Colon)
 
+        if self.current_token.type != TokenTypes.Print:
+            statement = self.assignment()
+        else:
+            self.eat(TokenTypes.Print)
+            statement = PrintVariable(self.get_character_being_spoken_to())
+            self.eat(TokenTypes.EndLine)
+
+        self.statements.append(statement)
+        self.speaking = None
+
+    def assignment(self):
         if self.current_token.type == TokenTypes.FirstPronoun:
             spoken_to = self.speaking
             self.eat(TokenTypes.FirstPronoun)
         elif self.current_token.type == TokenTypes.SecondPronoun:
-            if len(self.onstage) != 2:
-                raise SPLSyntaxError("There must be exactly 2 characters on stage to use a second person pronoun.")
-            spoken_to = list(character for character in self.onstage if character != name)
-            assert len(spoken_to) == 1
-            spoken_to = spoken_to[0]
+            spoken_to = self.get_character_being_spoken_to()
             self.eat(TokenTypes.SecondPronoun)
         else:
             spoken_to = self.eat(TokenTypes.Name)
 
         if spoken_to not in self.vars_table:
-            raise SPLSyntaxError("Cannot reference an undeclared character ('{}')".format(name))
+            raise SPLSyntaxError("Cannot reference an undeclared character ('{}')".format(self.speaking))
 
         expr_tree = self.expr()
-
-        self.statements.append(Assign(spoken_to, expr_tree))
-        self.speaking = None
+        return Assign(spoken_to, expr_tree)
 
     def play(self):
         # Ignore everything up to and including the first full stop.

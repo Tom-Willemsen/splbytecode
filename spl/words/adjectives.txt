@@ -93,3 +93,8 @@ vile
 villainous
 weak
 worried
+stupid
+fatherless
+big
+smelly
+half-witted

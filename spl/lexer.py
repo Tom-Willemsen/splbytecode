@@ -41,11 +41,22 @@ class Lexer(object):
             self.pos += len(text)
             return Token(TokenTypes.Scene)
 
+        found, text = self.text_starts_with_item("speak your mind")
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Print)
+
         # Names
         found, text = self.text_starts_with_any_of(self.names)
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Name, text)
+
+        # Adjectives
+        found, text = self.text_starts_with_any_of(self.adjectives)
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Adj, 2)
 
         # Nouns
         found, text = self.text_starts_with_any_of(self.nouns)
@@ -57,12 +68,6 @@ class Lexer(object):
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Noun, -1)
-
-        # Adjectives
-        found, text = self.text_starts_with_any_of(self.adjectives)
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Adj, 2)
 
         found, text = self.text_starts_with_any_of(["with", "and"])
         if found:

@@ -4,7 +4,6 @@ brother
 cat
 chihuahua
 cousin
-cow
 daughter
 door
 face
@@ -73,3 +72,4 @@ rose
 summer
 warrior
 spaceman
+my father

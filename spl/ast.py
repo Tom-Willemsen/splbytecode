@@ -39,6 +39,7 @@ class BinaryOperator(AstNode):
 
 class Value(AstNode):
     def __init__(self, value):
+        assert isinstance(value, int)
         self.value = value
 
     def __str__(self):
@@ -47,7 +48,17 @@ class Value(AstNode):
 
 class DynamicValue(AstNode):
     def __init__(self, field):
+        assert isinstance(field, str)
         self.field = field
 
     def __str__(self):
         return "(field '{}')".format(self.field)
+
+
+class PrintVariable(AstNode):
+    def __init__(self, field):
+        assert isinstance(field, str)
+        self.field = field
+
+    def __str__(self):
+        return "(print field '{}')".format(self.field)
