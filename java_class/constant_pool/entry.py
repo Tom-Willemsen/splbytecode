@@ -1,5 +1,8 @@
 from java_class.byte_utils import str_to_byte, u1, u2
 
+"""
+Constant pool entry types as given in the java class file documentation.
+"""
 id_Class = 7
 id_Fieldref = 9
 id_Methodref = 10
@@ -16,89 +19,35 @@ id_MethodType = 16
 id_InvokeDynamic = 18
 
 
-class Entry(object):
-    """
-    Abstract constant pool entry. Not intended to be used directly.
-    """
-    def get_bytes(self):
-        raise NotImplementedError
+def class_ref(name_index):
+    return u1(id_Class) \
+           + u2(name_index)
 
 
-class EntryClass(Entry):
-    """
-    A constant pool entry referring to a java_class.
-    """
-    def __init__(self, name_index):
-        self.name_index = name_index
-
-    def get_bytes(self):
-        return u1(id_Class) \
-               + u2(self.name_index)
+def method_ref(class_index, name_and_type_index):
+    return u1(id_Methodref) \
+           + u2(class_index) \
+           + u2(name_and_type_index)
 
 
-class EntryMethodRef(Entry):
-    """
-    A constant pool entry referring to a method.
-    """
-    def __init__(self, class_index, name_and_type_index):
-        self.class_index = class_index
-        self.name_and_type_index = name_and_type_index
-
-    def get_bytes(self):
-        return u1(id_Methodref) \
-               + u2(self.class_index) \
-               + u2(self.name_and_type_index)
+def field_ref(class_index, name_and_type_index):
+    return u1(id_Fieldref) \
+           + u2(class_index) \
+           + u2(name_and_type_index)
 
 
-class EntryFieldRef(Entry):
-    """
-    A constant pool entry referring to a field.
-    """
-    def __init__(self, class_index, name_and_type_index):
-        self.class_index = class_index
-        self.name_and_type_index = name_and_type_index
-
-    def get_bytes(self):
-        return u1(id_Fieldref) \
-               + u2(self.class_index) \
-               + u2(self.name_and_type_index)
+def utf8(text):
+    return u1(id_Utf8) \
+           + u2(len(text)) \
+           + str_to_byte(text)
 
 
-class EntryUtf8(Entry):
-    """
-    A constant pool entry representing a utf-8 string.
-    """
-    def __init__(self, text):
-        assert isinstance(text, str)
-        self.text = text
-
-    def get_bytes(self):
-        return u1(id_Utf8) \
-               + u2(len(self.text)) \
-               + str_to_byte(self.text)
+def name_and_type(name_index, descriptor_index):
+    return u1(id_NameAndType) \
+           + u2(name_index) \
+           + u2(descriptor_index)
 
 
-class EntryNameAndType(Entry):
-    """
-    A constant pool entry referring to a name-type pair.
-    """
-    def __init__(self, name_index, descriptor_index):
-        self.name_index = name_index
-        self.descriptor_index = descriptor_index
-
-    def get_bytes(self):
-        return u1(id_NameAndType) \
-               + u2(self.name_index) \
-               + u2(self.descriptor_index)
-
-
-class EntryString(Entry):
-    """
-    A constant pool entry representing a string.
-    """
-    def __init__(self, utf8str):
-        self.utf8str = utf8str
-
-    def get_bytes(self):
-        return u1(id_String) \
-               + u2(self.utf8str)
+def string(utf8str):
+    return u1(id_String) \
+           + u2(utf8str)

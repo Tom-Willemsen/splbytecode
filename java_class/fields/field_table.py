@@ -1,4 +1,4 @@
-from java_class.constant_pool.entry import EntryUtf8
+from java_class.constant_pool.entry import utf8
 from java_class.fields.field import Field
 
 
@@ -11,8 +11,8 @@ class FieldTable(object):
         self.constant_pool = constant_pool
 
     def add_field(self, name, descriptor, access_flags):
-        name_index = self.constant_pool.add_entry(EntryUtf8(name))
-        descriptor_index = self.constant_pool.add_entry(EntryUtf8(descriptor))
+        name_index = self.constant_pool.get_index(utf8(name))
+        descriptor_index = self.constant_pool.get_index(utf8(descriptor))
 
         for field in self.fields:
             if field.name_index == name_index and descriptor_index == descriptor_index:

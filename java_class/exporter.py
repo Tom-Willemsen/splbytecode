@@ -36,7 +36,7 @@ class Exporter(object):
         # Pool table
         stream.write(u2(len(self.output_class.pool_table) + 1))
         for entry in self.output_class.pool_table:
-            stream.write(entry.get_bytes())
+            stream.write(entry)
 
         # Access modifiers
         stream.write(u2(reduce(operator.xor, self.output_class.access_modifiers)))

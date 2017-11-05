@@ -1,4 +1,4 @@
-from java_class.constant_pool.entry import EntryUtf8
+from java_class.constant_pool.entry import utf8
 
 
 class CodeAttribute(object):
@@ -6,7 +6,7 @@ class CodeAttribute(object):
     Class specifying how a CodeAttribute object is outputted to the final .java_class file.
     """
     def __init__(self, constant_pool, code_specification):
-        self.code_attribute_index = constant_pool.add_entry(EntryUtf8("Code"))
+        self.code_attribute_index = constant_pool.get_index(utf8("Code"))
         self.max_stack = code_specification.max_stack
         self.max_locals = code_specification.max_locals
         self.instructions = code_specification.instructions

@@ -1,5 +1,5 @@
 from java_class.attributes.code import CodeAttribute
-from java_class.constant_pool.entry import EntryUtf8
+from java_class.constant_pool.entry import utf8
 
 
 class MethodTable(object):
@@ -11,8 +11,8 @@ class MethodTable(object):
         self.constant_pool = constant_pool
 
     def add_method(self, method_specification):
-        name_index = self.constant_pool.add_entry(EntryUtf8(method_specification.name))
-        descriptor_index = self.constant_pool.add_entry(EntryUtf8(method_specification.descriptor))
+        name_index = self.constant_pool.get_index(utf8(method_specification.name))
+        descriptor_index = self.constant_pool.get_index(utf8(method_specification.descriptor))
         access_flags = method_specification.access_flags
         code_specification = method_specification.code_specification
         self.methods.append(Method(name_index,
