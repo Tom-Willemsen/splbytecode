@@ -16,8 +16,6 @@ if __name__ == "__main__":
                             help="Output directory.", default=os.getcwd())
     arg_parser.add_argument('--output_class', type=str,
                             help="Output class name.", default="SplProgram")
-    arg_parser.add_argument('--allow-init', type=bool,
-                            help="Whether to allow variable initializers", default=True)
 
     args = arg_parser.parse_args()
 
@@ -36,9 +34,6 @@ if __name__ == "__main__":
 
         for statement in statements:
             cls_builder.ast_dump(statement)
-        #
-        # for var in var_initializations:
-        #     cls_builder.print_integer_field(var)
 
         cls = cls_builder.build()
     except CompilationError as e:
