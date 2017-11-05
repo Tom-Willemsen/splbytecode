@@ -33,9 +33,6 @@ class BinaryOperator(AstNode):
     def __str__(self):
         return "({} {} {})".format(self.left, self.op, self.right)
 
-    def __repr__(self):
-        return str(self)
-
     def get_children(self):
         return [self.left, self.right]
 
@@ -47,5 +44,10 @@ class Value(AstNode):
     def __str__(self):
         return "({})".format(self.value)
 
-    def __repr__(self):
-        return str(self)
+
+class DynamicValue(AstNode):
+    def __init__(self, field):
+        self.field = field
+
+    def __str__(self):
+        return "(field '{}')".format(self.field)

@@ -6,7 +6,7 @@ from java_class.exporter import Exporter
 from java_class.instructions import instructions
 from java_class.methods.method_table import MethodSpecification
 from java_class.java_class import JavaClass
-from spl.ast import BinaryOperator, Operators, Value, Assign
+from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue
 
 
 class CompilationError(Exception):
@@ -116,6 +116,8 @@ class Builder(object):
                 raise CompilationError("No instruction specified to map {}".format(tree.op))
         elif isinstance(tree, Value):
             self.code_specification.instructions.append(instructions.Bipush(tree.value))
+        elif isinstance(tree, DynamicValue):
+            self.push_field_value_onto_stack(tree.field)
         elif isinstance(tree, Assign):
             self.set_field_with_value_from_top_of_stack(tree.var)
         else:

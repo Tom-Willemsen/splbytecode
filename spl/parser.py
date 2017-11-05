@@ -1,4 +1,4 @@
-from spl.ast import Assign, Operators, BinaryOperator, Value
+from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -39,7 +39,7 @@ class Parser(object):
         if self.current_token.type == TokenTypes.Adj:
             return BinaryOperator(Value(self.eat(TokenTypes.Adj)), Operators.MULTIPLY, self.term())
         elif self.current_token.type == TokenTypes.Name:
-            return Value(self.eat(TokenTypes.Name))
+            return DynamicValue(self.eat(TokenTypes.Name))
         else:
             return Value(self.eat(TokenTypes.Noun))
 
