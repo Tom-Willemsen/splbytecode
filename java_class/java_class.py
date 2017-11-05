@@ -1,6 +1,5 @@
 from java_class import access_modifiers
 from java_class.byte_utils import u2
-from java_class.code import CodeAttribute
 from java_class.constant_pool import ConstantPool
 from java_class.constant_pool_entry import utf8
 
@@ -21,13 +20,11 @@ class JavaClass(object):
             self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
             self.version = (0x35, 0)  # JDK 9 by default
 
-    def add_method(self, method_specification):
-        name_index = self.pool.get_index(utf8(method_specification.name))
-        descriptor_index = self.pool.get_index(utf8(method_specification.descriptor))
-        access_flags = method_specification.access_flags
-        code_specification = method_specification.code_specification
-        self.methods.append(Method(name_index, descriptor_index, access_flags,
-                                   [CodeAttribute(self.pool, code_specification)]))
+    def add_method(self, name, descriptor, access_flags, attributes):
+
+        name_index = self.pool.get_index(utf8(name))
+        descriptor_index = self.pool.get_index(utf8(descriptor))
+        self.methods.append((name_index, descriptor_index, access_flags, attributes))
 
     def add_field(self, name, descriptor, access_flags):
         """
@@ -59,28 +56,6 @@ class JavaClass(object):
             raise InvalidClassError("Access modifiers not set.")
 
 
-class Method(object):
-    """
-    Class representing a method in a .java_class file.
-    """
-    def __init__(self, name_index, descriptor_index, access_flags, attributes):
-        self.name_index = name_index
-        self.descriptor_index = descriptor_index
-        self.access_flags = access_flags
-        self.attributes = attributes
-
-
-class MethodSpecification(object):
-    """
-    A method specification free from the implementation details of a .java_class file.
-    """
-    def __init__(self, name, descriptor, access_flags, code_specification):
-        self.access_flags = access_flags
-        self.name = name
-        self.descriptor = descriptor
-        self.code_specification = code_specification
-
-
 class Field(object):
     """
     Class representing a field in a .class file.
@@ -104,3 +79,20 @@ class Field(object):
 
     def __eq__(self, other):
         return self.name_index == other.name_index and self.descriptor_index == other.descriptor_index
+
+
+class CodeAttribute(object):
+    """
+    Class specifying how a CodeAttribute object is outputted to the final .java_class file.
+    """
+    def __init__(self, constant_pool, instructions, max_stack=32768, max_locals=32768):
+        self.code_attribute_index = constant_pool.get_index(utf8("Code"))
+        self.max_stack = max_stack
+        self.max_locals = max_locals
+        self.instructions = instructions
+        self.code_length = sum(len(instruction) for instruction in self.instructions)
+        self.exception_table_length = 0
+        self.attributes_count = 0
+
+    def __len__(self):
+        return self.code_length

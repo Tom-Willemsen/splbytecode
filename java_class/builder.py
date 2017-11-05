@@ -1,6 +1,5 @@
 from java_class import access_modifiers, instructions
-from java_class.code import CodeSpecification
-from java_class.java_class import JavaClass, MethodSpecification
+from java_class.java_class import JavaClass, CodeAttribute
 from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable
 
 
@@ -15,17 +14,16 @@ class Builder(object):
     def __init__(self, name):
         self.name = name
         self.output_class = JavaClass(name)
-        self.code_specification = CodeSpecification([], 32768, 32768)
+        self.main_method_instructions = []
 
     def build(self):
         """
         This methods performs final transformations before export.
         """
-
-        main_method = MethodSpecification("main", "([Ljava/lang/String;)V",
-                                          access_modifiers.PUBLIC | access_modifiers.STATIC, self.code_specification)
-        self.code_specification.instructions.append(instructions.voidreturn())
-        self.output_class.add_method(main_method)
+        self.main_method_instructions.append(instructions.voidreturn())
+        self.output_class.add_method("main", "([Ljava/lang/String;)V",
+                                     access_modifiers.PUBLIC | access_modifiers.STATIC,
+                                     [CodeAttribute(self.output_class.pool, self.main_method_instructions)])
 
         return self.output_class
 
@@ -33,7 +31,7 @@ class Builder(object):
         """
         Sets a field with a constant value.
         """
-        self.code_specification.instructions.append(instructions.bipush(value))
+        self.main_method_instructions.append(instructions.bipush(value))
         self.set_field_with_value_from_top_of_stack(name)
 
     def set_field_with_value_from_top_of_stack(self, name):
@@ -43,7 +41,7 @@ class Builder(object):
         self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
-        self.code_specification.instructions.extend([
+        self.main_method_instructions.extend([
             instructions.putstatic(field_ref),
         ])
 
@@ -56,18 +54,18 @@ class Builder(object):
         printstream = self.output_class.pool.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
         sysout = self.output_class.pool.add_method_ref("java/io/PrintStream", "println", "(C)V" if as_char else "(I)V")
 
-        self.code_specification.instructions.extend([
+        self.main_method_instructions.extend([
             instructions.getstatic(printstream),
             instructions.swap(),
         ])
 
         if as_char:
-            self.code_specification.instructions.append(instructions.i2c())
+            self.main_method_instructions.append(instructions.i2c())
 
-        self.code_specification.instructions.append(instructions.invokevirtual(sysout))
+        self.main_method_instructions.append(instructions.invokevirtual(sysout))
 
     def multiply_integer_at_top_of_stack_by_two(self):
-        self.code_specification.instructions.extend([
+        self.main_method_instructions.extend([
             instructions.bipush(2),
             instructions.imul(),
         ])
@@ -76,7 +74,7 @@ class Builder(object):
         self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
-        self.code_specification.instructions.append(instructions.getstatic(field_ref))
+        self.main_method_instructions.append(instructions.getstatic(field_ref))
 
     def print_field(self, name, as_char):
         self.push_field_value_onto_stack(name)
@@ -94,11 +92,11 @@ class Builder(object):
                 Operators.MULTIPLY: instructions.imul(),
             }
             try:
-                self.code_specification.instructions.append(operator_mapping[tree.op])
+                self.main_method_instructions.append(operator_mapping[tree.op])
             except KeyError:
                 raise CompilationError("No instruction specified to map {}".format(tree.op))
         elif isinstance(tree, Value):
-            self.code_specification.instructions.append(instructions.bipush(tree.value))
+            self.main_method_instructions.append(instructions.bipush(tree.value))
         elif isinstance(tree, DynamicValue):
             self.push_field_value_onto_stack(tree.field)
         elif isinstance(tree, Assign):

@@ -62,14 +62,14 @@ class Exporter(object):
 
         # Methods table
         stream.write(u2(len(self.output_class.methods)))
-        for method in self.output_class.methods:
-            stream.write(u2(method.access_flags))
-            stream.write(u2(method.name_index))
-            stream.write(u2(method.descriptor_index))
-            stream.write(u2(len(method.attributes)))
+        for name_index, descriptor_index, access_flags, attributes in self.output_class.methods:
+            stream.write(u2(access_flags))
+            stream.write(u2(name_index))
+            stream.write(u2(descriptor_index))
+            stream.write(u2(len(attributes)))
 
             # Attributes table within method table
-            for attribute in method.attributes:
+            for attribute in attributes:
                 stream.write(u2(attribute.code_attribute_index))
                 stream.write(u4(12 + attribute.code_length))
                 stream.write(u2(attribute.max_stack))
