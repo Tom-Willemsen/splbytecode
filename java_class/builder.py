@@ -56,32 +56,24 @@ class Builder(object):
             instructions.PutStatic(field_ref),
         ])
 
-    def integer_at_top_of_stack_to_sysout(self):
+    def integer_at_top_of_stack_to_sysout(self, as_char):
         """
         The integer at the top of the stack is popped and printed to standard out.
+
+        Formats as a character if as_char is True, otherwise formats as an integer.
         """
         printstream = self.pool_table.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
-        sysout_integer = self.pool_table.add_method_ref("java/io/PrintStream", "println", "(I)V")
+        sysout = self.pool_table.add_method_ref("java/io/PrintStream", "println", "(C)V" if as_char else "(I)V")
 
         self.code_specification.instructions.extend([
             instructions.GetStatic(printstream),
             instructions.Swap(),
-            instructions.InvokeVirtual(sysout_integer)
         ])
 
-    def integer_at_top_of_stack_to_sysout_as_char(self):
-        """
-        The integer at the top of the stack is popped and printed to standard out.
-        """
-        printstream = self.pool_table.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
-        sysout_integer = self.pool_table.add_method_ref("java/io/PrintStream", "print", "(C)V")
+        if as_char:
+            self.code_specification.instructions.append(instructions.I2c())
 
-        self.code_specification.instructions.extend([
-            instructions.GetStatic(printstream),
-            instructions.Swap(),
-            instructions.I2c(),
-            instructions.InvokeVirtual(sysout_integer)
-        ])
+        self.code_specification.instructions.append(instructions.InvokeVirtual(sysout))
 
     def multiply_integer_at_top_of_stack_by_two(self):
         self.code_specification.instructions.extend([
@@ -99,10 +91,7 @@ class Builder(object):
 
     def print_field(self, name, as_char):
         self.push_field_value_onto_stack(name)
-        if as_char:
-            self.integer_at_top_of_stack_to_sysout_as_char()
-        else:
-            self.integer_at_top_of_stack_to_sysout()
+        self.integer_at_top_of_stack_to_sysout(as_char)
 
     def ast_dump(self, tree):
         for node in tree.get_children():
