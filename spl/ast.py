@@ -63,3 +63,13 @@ class PrintVariable(AstNode):
 
     def __str__(self):
         return "(print field '{}')".format(self.field)
+
+
+class InputVariable(AstNode):
+    def __init__(self, field, as_char=False):
+        assert isinstance(field, str)
+        self.field = field
+        self.as_char = as_char
+
+    def __str__(self):
+        return "(input to field '{}')".format(self.field)

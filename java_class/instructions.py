@@ -47,3 +47,15 @@ def getfield(ref):
 
 def i2c():
     return u1(0x92)
+
+
+def aload(idx):
+    return u1(0x19) + u1(idx)
+
+
+def aaload():
+    return u1(0x32)
+
+
+def invokestatic(ref):
+    return u1(0xB8) + u2(ref)
