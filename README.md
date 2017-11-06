@@ -20,6 +20,5 @@ Current deficiencies/TODOs:
 - Each character can only say one line at a time.
 - Compiler always produces a "java 9" class. This should be configurable.
 - Turn on/off variable initializers (The official spec says the text after a variable declaration is ignored, but other compilers try to interpret it as a value)
-- Allow input (probably passed in as `String[] args`).
 
 But seriously, if you're trying to compile SPL to Java bytecode, you have far bigger problems than the above...
