@@ -36,3 +36,4 @@ class TokenTypes(object):
     Exit = "Exit"
     Exeunt = "Exeunt"
     Print = "Print"
+    Input = "Input"

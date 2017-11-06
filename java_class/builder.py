@@ -1,6 +1,6 @@
 from java_class import access_modifiers, instructions
 from java_class.java_class import JavaClass
-from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable
+from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable, InputVariable
 
 
 class CompilationError(Exception):
@@ -8,6 +8,9 @@ class CompilationError(Exception):
 
 
 class Builder(object):
+
+    INPUT_INDEX = "$input_index"
+
     """
     This java_class generates a valid java java_class file, ready for export.
     """
@@ -15,6 +18,8 @@ class Builder(object):
         self.name = name
         self.output_class = JavaClass(name)
         self.main_method_instructions = []
+
+        self.set_field(Builder.INPUT_INDEX, 0)
 
     def build(self):
         """
@@ -84,6 +89,22 @@ class Builder(object):
         self.push_field_value_onto_stack(name)
         self.integer_at_top_of_stack_to_sysout(as_char)
 
+    def input_to_field(self, name, as_char):
+        self.main_method_instructions.append(instructions.aload(0))
+        self.push_field_value_onto_stack(Builder.INPUT_INDEX)
+
+        self.main_method_instructions.append(instructions.aaload())
+
+        if as_char:
+            self.main_method_instructions.append(instructions.bipush(0))
+            char_at = self.output_class.pool.add_method_ref("java/lang/String", "charAt", "(I)C")
+            self.main_method_instructions.append(instructions.invokevirtual(char_at))
+        else:
+            parse_int = self.output_class.pool.add_method_ref("java/lang/Integer", "parseInt", "(Ljava/lang/String;)I")
+            self.main_method_instructions.append(instructions.invokestatic(parse_int))
+
+        self.set_field_with_value_from_top_of_stack(name)
+
     def ast_dump(self, tree):
         for node in tree.get_children():
             self.ast_dump(node)
@@ -107,5 +128,7 @@ class Builder(object):
             self.set_field_with_value_from_top_of_stack(tree.var)
         elif isinstance(tree, PrintVariable):
             self.print_field(tree.field, tree.as_char)
+        elif isinstance(tree, InputVariable):
+            self.input_to_field(tree.field, tree.as_char)
         else:
             raise CompilationError("Unknown type of AST node {}".format(tree))

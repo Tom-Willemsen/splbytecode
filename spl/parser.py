@@ -1,4 +1,4 @@
-from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable
+from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -156,12 +156,16 @@ class Parser(object):
 
         self.eat(TokenTypes.Colon)
 
-        if self.current_token.type != TokenTypes.Print:
-            statement = self.assignment()
-        else:
+        if self.current_token.type == TokenTypes.Print:
             as_char = self.eat(TokenTypes.Print)
             statement = PrintVariable(self.get_character_being_spoken_to(), as_char)
             self.eat(TokenTypes.EndLine)
+        elif self.current_token.type == TokenTypes.Input:
+            as_char = self.eat(TokenTypes.Input)
+            statement = InputVariable(self.get_character_being_spoken_to(), as_char)
+            self.eat(TokenTypes.EndLine)
+        else:
+            statement = self.assignment()
 
         self.statements.append(statement)
         self.speaking = None
