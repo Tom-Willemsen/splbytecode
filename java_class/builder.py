@@ -104,6 +104,15 @@ class Builder(object):
             self.main_method_instructions.append(instructions.invokestatic(parse_int))
 
         self.set_field_with_value_from_top_of_stack(name)
+        self.increment_field(Builder.INPUT_INDEX)
+
+    def increment_field(self, name):
+        self.push_field_value_onto_stack(name)
+        self.main_method_instructions.extend([
+            instructions.bipush(1),
+            instructions.iadd(),
+        ])
+        self.set_field_with_value_from_top_of_stack(name)
 
     def ast_dump(self, tree):
         for node in tree.get_children():
