@@ -9,7 +9,7 @@ class CompilationError(Exception):
 
 class Builder(object):
     """
-    This java_class generates a valid java java_class file, ready for export.
+    This generates a valid java class file, ready for export.
     """
     def __init__(self, name):
         self.name = name
