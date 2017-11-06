@@ -1,11 +1,30 @@
 # splbytecode
 Shakespeare programming language to Java bytecode compiler
 
-To compile:
-`python compiler.py hello.spl`
+Hello, world:
+```
+> python compiler.py hello.spl
+> java SplProgram
+H
+E
+L
+L
+O
+,
 
-To run:
-`java SplProgram`
+W
+O
+R
+L
+D
+```
+
+Incrementing user input:
+```
+> python compiler.py incrementor.spl
+> java SplProgram 100
+101
+```
 
 Developed with Python 3.6 and Java 9. 
 
