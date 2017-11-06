@@ -18,7 +18,16 @@ def invokevirtual(method):
 
 
 def bipush(value):
-    return u1(0x10) + u1(value, signed=True)
+    if value == -1:
+        return u1(0x2)  # iconst_m1
+    elif value == 0:
+        return u1(0x3)  # iconst_0
+    elif value == 1:
+        return u1(0x4)  # iconst_1
+    elif value == 2:
+        return u1(0x5)  # iconst_2
+    else:
+        return u1(0x10) + u1(value, signed=True)
 
 
 def swap():
@@ -50,7 +59,16 @@ def i2c():
 
 
 def aload(idx):
-    return u1(0x19) + u1(idx)
+    if idx == 0:
+        return u1(0x2A)  # aload_0
+    elif idx == 1:
+        return u1(0x2B)  # aload_1
+    elif idx == 2:
+        return u1(0x2C)  # aload_2
+    elif idx == 3:
+        return u1(0x2D)  # aload_3
+    else:
+        return u1(0x19) + u1(idx)
 
 
 def aaload():

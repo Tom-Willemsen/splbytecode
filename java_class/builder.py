@@ -8,13 +8,24 @@ class CompilationError(Exception):
 
 
 class Builder(object):
+    """
+    Builder class for a .class file. Contains methods for performing abstracted operations
+    (reading/writing from fields, invoking methods, etc).
+    """
 
+    # Variable used to keep track of how many inputs have been "used up" from 'String[] args'
     INPUT_INDEX = "$input_index"
 
-    """
-    This generates a valid java class file, ready for export.
-    """
+    # Access modifier for all fields that this builder generates.
+    FIELD_ACCESS_MODIFIERS = access_modifiers.PUBLIC | access_modifiers.STATIC
+
+    # Access modifier for the main method that this builder generates
+    MAIN_METHOD_ACCESS_MODIFIERS = access_modifiers.PUBLIC | access_modifiers.STATIC
+
     def __init__(self, name):
+        """
+        This generates the stub of a valid java class file.
+        """
         self.name = name
         self.output_class = JavaClass(name)
         self.main_method_instructions = []
@@ -26,8 +37,8 @@ class Builder(object):
         This methods performs final transformations before export.
         """
         self.main_method_instructions.append(instructions.voidreturn())
-        self.output_class.add_method("main", "([Ljava/lang/String;)V",
-                                     access_modifiers.PUBLIC | access_modifiers.STATIC, self.main_method_instructions)
+        self.output_class.add_method("main", "([Ljava/lang/String;)V", Builder.MAIN_METHOD_ACCESS_MODIFIERS,
+                                     self.main_method_instructions)
 
         valid, message = self.output_class.check_valid()
         if not valid:
@@ -41,17 +52,19 @@ class Builder(object):
         """
         self.main_method_instructions.append(instructions.bipush(value))
         self.set_field_with_value_from_top_of_stack(name)
+        return self
 
     def set_field_with_value_from_top_of_stack(self, name):
         """
         Sets a field to have the value at the top of the stack.
         """
-        self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
+        self.output_class.add_field(name, "I", Builder.FIELD_ACCESS_MODIFIERS)
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
         self.main_method_instructions.extend([
             instructions.putstatic(field_ref),
         ])
+        return self
 
     def integer_at_top_of_stack_to_sysout(self, as_char):
         """
@@ -71,19 +84,22 @@ class Builder(object):
             self.main_method_instructions.append(instructions.i2c())
 
         self.main_method_instructions.append(instructions.invokevirtual(sysout))
+        return self
 
     def multiply_integer_at_top_of_stack_by_two(self):
         self.main_method_instructions.extend([
             instructions.bipush(2),
             instructions.imul(),
         ])
+        return self
 
     def push_field_value_onto_stack(self, name):
         # Ensures the field exists otherwise getting it will cause a runtime error.
-        self.output_class.add_field(name, "I", access_modifiers.PUBLIC | access_modifiers.STATIC)
+        self.output_class.add_field(name, "I", Builder.FIELD_ACCESS_MODIFIERS)
 
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
         self.main_method_instructions.append(instructions.getstatic(field_ref))
+        return self
 
     def print_field(self, name, as_char):
         self.push_field_value_onto_stack(name)
@@ -105,6 +121,7 @@ class Builder(object):
 
         self.set_field_with_value_from_top_of_stack(name)
         self.increment_field(Builder.INPUT_INDEX)
+        return self
 
     def increment_field(self, name):
         self.push_field_value_onto_stack(name)
@@ -113,6 +130,7 @@ class Builder(object):
             instructions.iadd(),
         ])
         self.set_field_with_value_from_top_of_stack(name)
+        return self
 
     def ast_dump(self, tree):
         for node in tree.get_children():
@@ -141,3 +159,5 @@ class Builder(object):
             self.input_to_field(tree.field, tree.as_char)
         else:
             raise CompilationError("Unknown type of AST node {}".format(tree))
+
+        return self
