@@ -12,10 +12,14 @@ if __name__ == "__main__":
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     arg_parser.add_argument('input', type=str,
                             help="File path to the SPL input file.")
-    arg_parser.add_argument('--output_dir', type=str,
+    arg_parser.add_argument('--output-dir', type=str,
                             help="Output directory.", default=os.getcwd())
-    arg_parser.add_argument('--output_class', type=str,
+    arg_parser.add_argument('--output-class', type=str,
                             help="Output class name.", default="SplProgram")
+    arg_parser.add_argument('--cls-maj-version', type=int,
+                            help="Major version number of java output class.", default=53)
+    arg_parser.add_argument('--cls-min-version', type=int,
+                            help="Minor version number of java output class.", default=0)
 
     args = arg_parser.parse_args()
 
@@ -38,4 +42,5 @@ if __name__ == "__main__":
         print("Compiler error: {}".format(e))
         sys.exit(1)
 
+    cls.set_version(args.cls_maj_version, args.cls_min_version)
     Exporter(cls).export_as_file(args.output_dir)

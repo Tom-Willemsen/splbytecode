@@ -80,5 +80,5 @@ class Exporter(object):
                 stream.write(u2(0))  # Exception table not implemented
                 stream.write(u2(0))  # Attributes of attributes not implemented
 
-        # Attributes table (not implemented)
+                # Attributes table (not implemented)
         stream.write(u2(0))

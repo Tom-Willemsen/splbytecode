@@ -18,7 +18,10 @@ class JavaClass(object):
             self.fields = []
 
             self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
-            self.version = (0x35, 0)  # JDK 9 by default
+            self.version = (53, 0)  # JDK 9 by default
+
+    def set_version(self, major, minor=0):
+        self.version = (major, minor)
 
     def add_method(self, name, descriptor, access_flags, instructions):
 
