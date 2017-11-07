@@ -14,7 +14,7 @@ if __name__ == "__main__":
                             help="File path to the SPL input file.")
     arg_parser.add_argument('--output-dir', type=str,
                             help="Output directory.", default=os.getcwd())
-    arg_parser.add_argument('--output-class', type=str,
+    arg_parser.add_argument('--cls-name', type=str,
                             help="Output class name.", default="SplProgram")
     arg_parser.add_argument('--cls-maj-version', type=int,
                             help="Major version number of java output class.", default=53)
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        cls_builder = Builder(args.output_class)
+        cls_builder = Builder(args.cls_name)
         
         for statement in statements:
             cls_builder.ast_dump(statement)
