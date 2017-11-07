@@ -28,7 +28,7 @@ Incrementing user input:
 
 Requires Python 3.6 and a JRE >= 5 (versions before 5 did not allow spaces in field names). No need for a JDK.
 
-Note: A Java 9 class is produced by default. This can be configured using `--cls-maj-version 52`. See [list of valid version numbers](https://stackoverflow.com/questions/9170832/list-of-java-class-file-format-major-version-numbers).
+Note: A Java 9 class is produced by default. This can be configured using the `--cls-maj-version` compiler option. See [list of valid version numbers](https://stackoverflow.com/questions/9170832/list-of-java-class-file-format-major-version-numbers).
 
 
 Current deficiencies/TODOs:
