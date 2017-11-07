@@ -1,5 +1,5 @@
 # splbytecode
-Shakespeare programming language to Java bytecode compiler
+Shakespeare programming language to Java bytecode compiler.
 
 Hello, world:
 ```
@@ -26,9 +26,9 @@ Incrementing user input:
 101
 ```
 
-Developed with Python 3.6 and Java 9. 
+Requires Python 3.6 and a JRE >= 5 (versions before 5 did not allow spaces in field names). No need for a JDK.
 
-The resulting `.class` file reports it's version as Java 9 but I suspect if the version number was changed it would work on an older JRE.
+Note: A Java 9 class is produced by default. This can be configured using `--cls-maj-version 52`. See [list of valid version numbers](https://stackoverflow.com/questions/9170832/list-of-java-class-file-format-major-version-numbers).
 
 
 Current deficiencies/TODOs:
@@ -37,7 +37,6 @@ Current deficiencies/TODOs:
 - Characters are single-valued, stacks have not been implemented.
 - Arithmetic isn't supported yet (e.g. `You are the quotient of ... and ...`)
 - Each character can only say one line at a time.
-- Compiler always produces a "java 9" class. This should be configurable.
 - Turn on/off variable initializers (The official spec says the text after a variable declaration is ignored, but other compilers try to interpret it as a value)
 
 But seriously, if you're trying to compile SPL to Java bytecode, you have far bigger problems than the above...
