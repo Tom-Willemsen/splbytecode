@@ -1,4 +1,4 @@
-from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable
+from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable, Goto
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -164,11 +164,25 @@ class Parser(object):
             as_char = self.eat(TokenTypes.Input)
             statement = InputVariable(self.get_character_being_spoken_to(), as_char)
             self.eat(TokenTypes.EndLine)
+        elif self.current_token.type == TokenTypes.Goto:
+            statement = self.goto()
+            self.eat(TokenTypes.EndLine)
         else:
             statement = self.assignment()
 
         self.statements.append(statement)
         self.speaking = None
+
+    def goto(self):
+        self.eat(TokenTypes.Goto)
+        if self.current_token.type == TokenTypes.Act:
+            self.eat(TokenTypes.Act)
+            return Goto(act=1, scene=1)
+        elif self.current_token.type == TokenTypes.Scene:
+            self.eat(TokenTypes.Scene)
+            return Goto(act=1, scene=1)
+        else:
+            raise SPLSyntaxError("Expected act or scene, got {}".format(self.current_token.type))
 
     def assignment(self):
         if self.current_token.type == TokenTypes.FirstPronoun:

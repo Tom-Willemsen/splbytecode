@@ -73,3 +73,12 @@ class InputVariable(AstNode):
 
     def __str__(self):
         return "(input to field '{}')".format(self.field)
+
+
+class Goto(AstNode):
+    def __init__(self, act, scene):
+        self.act = act
+        self.scene = scene
+
+    def __str__(self):
+        return "(Goto act={} scene={})".format(self.act, self.scene)

@@ -61,6 +61,12 @@ class Lexer(object):
             self.pos += len(text)
             return Token(TokenTypes.Input, False)
 
+        # goto
+        found, text = self.text_starts_with_any_of(["let us proceed to", "let us return to"])
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Goto)
+
         # Names
         found, text = self.text_starts_with_any_of(self.names)
         if found:

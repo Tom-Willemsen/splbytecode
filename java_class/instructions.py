@@ -1,4 +1,4 @@
-from java_class.byte_utils import u1, u2
+from java_class.byte_utils import u1, u2, u4
 
 
 def voidreturn():
@@ -77,3 +77,10 @@ def aaload():
 
 def invokestatic(ref):
     return u1(0xB8) + u2(ref)
+
+
+def goto(offset):
+    if -127 <= offset <= 127:
+        return u1(0xA7) + u2(offset, signed=True)  # goto
+    else:
+        return u1(0xC8) + u4(offset, signed=True)  # goto_w
