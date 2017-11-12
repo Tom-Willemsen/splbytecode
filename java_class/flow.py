@@ -39,7 +39,9 @@ class Goto(object):
                 print("Found a goto")
 
                 idx = code.index(instruction)
-                code[idx] = goto_w(idx - labels[instruction.name]-1)
+                code_line = sum(len(i) for i in code[0:idx])
+                print(idx)
+                code[idx] = goto_w(labels[instruction.name]-code_line)
 
         for instruction in code:
             if isinstance(instruction, Goto):

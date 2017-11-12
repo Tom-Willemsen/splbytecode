@@ -137,10 +137,16 @@ class Builder(object):
         return self
 
     def ast_dump(self, tree):
-        for node in tree.get_children():
-            self.ast_dump(node)
 
         assert isinstance(tree, AstNode)
+
+        if isinstance(tree, Goto):
+            self.main_method_instructions.append(flow.Goto(tree.name, False))
+        elif isinstance(tree, Label):
+            self.main_method_instructions.append(flow.Goto(tree.name, True))
+
+        for node in tree.get_children():
+            self.ast_dump(node)
 
         if isinstance(tree, BinaryOperator):
             operator_mapping = {
@@ -161,13 +167,9 @@ class Builder(object):
             self.print_field(tree.field, tree.as_char)
         elif isinstance(tree, InputVariable):
             self.input_to_field(tree.field, tree.as_char)
-        elif isinstance(tree, Goto):
-            self.main_method_instructions.append(flow.Goto(tree.name, False))
-        elif isinstance(tree, Label):
-            self.main_method_instructions.append(flow.Goto(tree.name, True))
         elif isinstance(tree, NoOp):
             pass
-        else:
+        elif not (isinstance(tree, Goto) or isinstance(tree, Label)):
             raise CompilationError("Unknown type of AST node {}".format(tree))
 
         return self

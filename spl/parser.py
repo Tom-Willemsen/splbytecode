@@ -94,7 +94,7 @@ class Parser(object):
         while self.current_token.type != TokenTypes.Eof and self.current_token.type != TokenTypes.Act:
             children.append(self.scene())
 
-        return Label(name="", children=children)
+        return Label(name="act", children=children)
 
     def scene(self):
         self.eat(TokenTypes.Scene)
@@ -117,7 +117,7 @@ class Parser(object):
         if len(self.onstage) != 0:
             raise SPLSyntaxError("Cannot have characters left on stage at the end of a scene")
 
-        return Label(name=id, children=children)
+        return Label(name="scene", children=children)
 
     def statement(self):
         if self.current_token.type == TokenTypes.OpenSqBracket:
@@ -190,10 +190,10 @@ class Parser(object):
         self.eat(TokenTypes.Goto)
         if self.current_token.type == TokenTypes.Act:
             self.eat(TokenTypes.Act)
-            return Goto(name="")
+            return Goto(name="act")
         elif self.current_token.type == TokenTypes.Scene:
             self.eat(TokenTypes.Scene)
-            return Goto(name="")
+            return Goto(name="scene")
         else:
             raise SPLSyntaxError("Expected act or scene, got {}".format(self.current_token.type))
 
@@ -227,4 +227,4 @@ class Parser(object):
         while self.current_token.type != TokenTypes.Eof:
             children.append(self.act())
 
-        return Label(name="", children=children)
+        return Label(name="play", children=children)
