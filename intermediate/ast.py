@@ -7,6 +7,9 @@ class AstNode(object):
     def get_children(self):
         return []
 
+    def __repr__(self):
+        return str(self)
+
 
 class NoOp(AstNode):
     def __str__(self):

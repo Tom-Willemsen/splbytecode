@@ -15,36 +15,23 @@ class Goto(object):
             return False
         return self.name == other.name and self.destination == other.destination
 
-    @staticmethod
-    def compute_gotos(code):
 
-        labels = {}
+def compute_gotos(code):
 
-        print(code)
+    def length_of_code_up_to_instruction(num):
+        return sum(len(i) for i in code[0:num])
 
-        for instruction in code:
-            if isinstance(instruction, Goto) and instruction.destination:
+    labels = {}
 
-                print("Found a label")
+    for instruction in code:
+        if isinstance(instruction, Goto) and instruction.destination:
+            idx = code.index(Goto(instruction.name, True))
+            labels[instruction.name] = length_of_code_up_to_instruction(idx)
+            code[idx] = instructions.nop()
 
-                idx = code.index(Goto(instruction.name, True))
+    for instruction in code:
+        if isinstance(instruction, Goto) and not instruction.destination:
+            idx = code.index(instruction)
+            code[idx] = goto_w(labels[instruction.name] - length_of_code_up_to_instruction(idx))
 
-                labels[instruction.name] = sum(len(i) for i in code[0:idx])
-
-        print(labels)
-
-        for instruction in code:
-            if isinstance(instruction, Goto) and not instruction.destination:
-
-                print("Found a goto")
-
-                idx = code.index(instruction)
-                code_line = sum(len(i) for i in code[0:idx])
-                print(idx)
-                code[idx] = goto_w(labels[instruction.name]-code_line)
-
-        for instruction in code:
-            if isinstance(instruction, Goto):
-                code[code.index(instruction)] = instructions.nop()
-
-        return code
+    return code

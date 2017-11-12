@@ -2,6 +2,7 @@ import sys
 import os
 import argparse
 
+from intermediate.asl import flatten_ast
 from java_class.builder import Builder, CompilationError
 from java_class.exporter import Exporter
 from spl.parser import Parser, SPLSyntaxError
@@ -27,14 +28,13 @@ if __name__ == "__main__":
 
     try:
         ast = spl_parser.play()
+        asl = flatten_ast(ast)
     except SPLSyntaxError as e:
         print("Syntax error: {}".format(e))
         sys.exit(1)
 
     try:
-        cls_builder = Builder(args.cls_name)
-        cls_builder.ast_dump(ast)
-        cls = cls_builder.build()
+        cls = Builder(args.cls_name).asl_dump(asl).build()
         cls.set_version(args.cls_maj_version, args.cls_min_version)
     except CompilationError as e:
         print("Compiler error: {}".format(e))

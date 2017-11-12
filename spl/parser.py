@@ -1,4 +1,4 @@
-from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable, Goto, Label, \
+from intermediate.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable, Goto, Label, \
     NoOp
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes

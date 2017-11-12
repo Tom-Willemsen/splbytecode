@@ -1,4 +1,4 @@
-from spl.ast import Operators
+from intermediate.ast import Operators
 from spl.tokens import Token, TokenTypes
 
 

@@ -1,7 +1,7 @@
+from intermediate.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, PrintVariable, \
+    InputVariable, Goto, Label, NoOp
 from java_class import access_modifiers, instructions, flow
 from java_class.java_class import JavaClass
-from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable, InputVariable, Goto, \
-    Label, NoOp
 
 
 class CompilationError(Exception):
@@ -29,7 +29,7 @@ class Builder(object):
         """
         self.name = name
         self.output_class = JavaClass(name)
-        self.main_method_instructions = []
+        self.code = []
 
         self.set_field(Builder.INPUT_INDEX, 0)
 
@@ -37,12 +37,10 @@ class Builder(object):
         """
         This methods performs final transformations before export.
         """
-        self.main_method_instructions.append(instructions.voidreturn())
-
-        self.main_method_instructions = flow.Goto.compute_gotos(self.main_method_instructions)
+        self.code.append(instructions.voidreturn())
 
         self.output_class.add_method("main", "([Ljava/lang/String;)V", Builder.MAIN_METHOD_ACCESS_MODIFIERS,
-                                     self.main_method_instructions)
+                                     flow.compute_gotos(self.code))
 
         valid, message = self.output_class.check_valid()
         if not valid:
@@ -54,7 +52,7 @@ class Builder(object):
         """
         Sets a field with a constant value.
         """
-        self.main_method_instructions.append(instructions.bipush(value))
+        self.code.append(instructions.bipush(value))
         self.set_field_with_value_from_top_of_stack(name)
         return self
 
@@ -65,7 +63,7 @@ class Builder(object):
         self.output_class.add_field(name, "I", Builder.FIELD_ACCESS_MODIFIERS)
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
-        self.main_method_instructions.extend([
+        self.code.extend([
             instructions.putstatic(field_ref),
         ])
         return self
@@ -79,19 +77,19 @@ class Builder(object):
         printstream = self.output_class.pool.add_field_ref("java/lang/System", "out", "Ljava/io/PrintStream;")
         sysout = self.output_class.pool.add_method_ref("java/io/PrintStream", "println", "(C)V" if as_char else "(I)V")
 
-        self.main_method_instructions.extend([
+        self.code.extend([
             instructions.getstatic(printstream),
             instructions.swap(),
         ])
 
         if as_char:
-            self.main_method_instructions.append(instructions.i2c())
+            self.code.append(instructions.i2c())
 
-        self.main_method_instructions.append(instructions.invokevirtual(sysout))
+        self.code.append(instructions.invokevirtual(sysout))
         return self
 
     def multiply_integer_at_top_of_stack_by_two(self):
-        self.main_method_instructions.extend([
+        self.code.extend([
             instructions.bipush(2),
             instructions.imul(),
         ])
@@ -102,7 +100,7 @@ class Builder(object):
         self.output_class.add_field(name, "I", Builder.FIELD_ACCESS_MODIFIERS)
 
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
-        self.main_method_instructions.append(instructions.getstatic(field_ref))
+        self.code.append(instructions.getstatic(field_ref))
         return self
 
     def print_field(self, name, as_char):
@@ -110,18 +108,18 @@ class Builder(object):
         self.integer_at_top_of_stack_to_sysout(as_char)
 
     def input_to_field(self, name, as_char):
-        self.main_method_instructions.append(instructions.aload(0))
+        self.code.append(instructions.aload(0))
         self.push_field_value_onto_stack(Builder.INPUT_INDEX)
 
-        self.main_method_instructions.append(instructions.aaload())
+        self.code.append(instructions.aaload())
 
         if as_char:
-            self.main_method_instructions.append(instructions.bipush(0))
+            self.code.append(instructions.bipush(0))
             char_at = self.output_class.pool.add_method_ref("java/lang/String", "charAt", "(I)C")
-            self.main_method_instructions.append(instructions.invokevirtual(char_at))
+            self.code.append(instructions.invokevirtual(char_at))
         else:
             parse_int = self.output_class.pool.add_method_ref("java/lang/Integer", "parseInt", "(Ljava/lang/String;)I")
-            self.main_method_instructions.append(instructions.invokestatic(parse_int))
+            self.code.append(instructions.invokestatic(parse_int))
 
         self.set_field_with_value_from_top_of_stack(name)
         self.increment_field(Builder.INPUT_INDEX)
@@ -129,47 +127,43 @@ class Builder(object):
 
     def increment_field(self, name):
         self.push_field_value_onto_stack(name)
-        self.main_method_instructions.extend([
+        self.code.extend([
             instructions.bipush(1),
             instructions.iadd(),
         ])
         self.set_field_with_value_from_top_of_stack(name)
         return self
 
-    def ast_dump(self, tree):
+    def add_operator_instruction_from_node(self, node):
+        operator_mapping = {
+            Operators.ADD: instructions.iadd(),
+            Operators.MULTIPLY: instructions.imul(),
+        }
+        try:
+            self.code.append(operator_mapping[node.op])
+        except KeyError:
+            raise CompilationError("No instruction specified to map {}".format(node.op))
 
-        assert isinstance(tree, AstNode)
+    def asl_dump(self, asl):
 
-        if isinstance(tree, Goto):
-            self.main_method_instructions.append(flow.Goto(tree.name, False))
-        elif isinstance(tree, Label):
-            self.main_method_instructions.append(flow.Goto(tree.name, True))
+        mapping = {
+            Goto: lambda item: self.code.append(flow.Goto(item.name, False)),
+            Label: lambda item: self.code.append(flow.Goto(item.name, True)),
+            BinaryOperator: lambda item: self.add_operator_instruction_from_node(item),
+            Value: lambda item: self.code.append(instructions.bipush(item.value)),
+            DynamicValue: lambda item: self.push_field_value_onto_stack(item.field),
+            Assign: lambda item: self.set_field_with_value_from_top_of_stack(item.var),
+            PrintVariable: lambda item: self.print_field(item.field, item.as_char),
+            InputVariable: lambda item: self.input_to_field(item.field, item.as_char),
+            NoOp: lambda item: None
+        }
 
-        for node in tree.get_children():
-            self.ast_dump(node)
-
-        if isinstance(tree, BinaryOperator):
-            operator_mapping = {
-                Operators.ADD: instructions.iadd(),
-                Operators.MULTIPLY: instructions.imul(),
-            }
-            try:
-                self.main_method_instructions.append(operator_mapping[tree.op])
-            except KeyError:
-                raise CompilationError("No instruction specified to map {}".format(tree.op))
-        elif isinstance(tree, Value):
-            self.main_method_instructions.append(instructions.bipush(tree.value))
-        elif isinstance(tree, DynamicValue):
-            self.push_field_value_onto_stack(tree.field)
-        elif isinstance(tree, Assign):
-            self.set_field_with_value_from_top_of_stack(tree.var)
-        elif isinstance(tree, PrintVariable):
-            self.print_field(tree.field, tree.as_char)
-        elif isinstance(tree, InputVariable):
-            self.input_to_field(tree.field, tree.as_char)
-        elif isinstance(tree, NoOp):
-            pass
-        elif not (isinstance(tree, Goto) or isinstance(tree, Label)):
-            raise CompilationError("Unknown type of AST node {}".format(tree))
+        for item in asl:
+            for node_type in mapping.keys():
+                if isinstance(item, node_type):
+                    mapping[node_type](item)
+                    break
+            else:
+                raise CompilationError("No rule to map {}".format(item))
 
         return self
