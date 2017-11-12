@@ -1,6 +1,7 @@
 from java_class import access_modifiers, instructions
 from java_class.java_class import JavaClass
-from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable, InputVariable, Goto
+from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable, InputVariable, Goto, \
+    Label, NoOp
 
 
 class CompilationError(Exception):
@@ -158,7 +159,11 @@ class Builder(object):
         elif isinstance(tree, InputVariable):
             self.input_to_field(tree.field, tree.as_char)
         elif isinstance(tree, Goto):
-            self.main_method_instructions.append(instructions.goto(0))
+            self.main_method_instructions.append(instructions.goto(-10))
+        elif isinstance(tree, Label):
+            print(str(tree))
+        elif isinstance(tree, NoOp):
+            pass
         else:
             raise CompilationError("Unknown type of AST node {}".format(tree))
 

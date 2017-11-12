@@ -1,4 +1,5 @@
-from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable, Goto
+from spl.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable, Goto, Label, \
+    NoOp
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -14,7 +15,6 @@ class Parser(object):
         self.next_token()
 
         self.vars_table = []  # List of variable names declared.
-        self.statements = []  # List of statements to be executed
 
         self.onstage = []  # List of characters currently on stage (for figuring out who "you" is...)
         self.speaking = None  # Character currently speaking
@@ -81,7 +81,7 @@ class Parser(object):
         if name in self.vars_table:
             raise SPLSyntaxError("Redeclaring variables is not allowed ('{}').".format(name))
         self.vars_table.append(name)
-        self.statements.append(Assign(name, value, dynamic=False))
+        return Assign(name, value, dynamic=False)
 
     def act(self):
         self.eat(TokenTypes.Act)
@@ -89,29 +89,42 @@ class Parser(object):
             self.next_token()
         self.eat(TokenTypes.EndLine)
 
-        self.scene()
+        children = [self.scene()]
+
         while self.current_token.type != TokenTypes.Eof and self.current_token.type != TokenTypes.Act:
-            self.scene()
+            children.append(self.scene())
+
+        return Label(scene=False, name="", children=children)
 
     def scene(self):
         self.eat(TokenTypes.Scene)
+        id = ""
+        while self.current_token.type != TokenTypes.Colon:
+            id += self.eat(self.current_token.type)
+        self.eat(TokenTypes.Colon)
+
         while self.current_token.type != TokenTypes.EndLine:
-            self.next_token()
+            self.eat(self.current_token.type)
         self.eat(TokenTypes.EndLine)
+
+        children = []
 
         while self.current_token.type != TokenTypes.Eof \
                 and self.current_token.type != TokenTypes.Act\
                 and self.current_token.type != TokenTypes.Scene:
-            self.statement()
+            children.append(self.statement())
 
         if len(self.onstage) != 0:
             raise SPLSyntaxError("Cannot have characters left on stage at the end of a scene")
 
+        return Label(scene=True, name=id, children=children)
+
     def statement(self):
         if self.current_token.type == TokenTypes.OpenSqBracket:
             self.stagecontrol()
+            return NoOp()
         else:
-            self.speech()
+            return self.speech()
 
     def stagecontrol(self):
         self.eat(TokenTypes.OpenSqBracket)
@@ -170,8 +183,8 @@ class Parser(object):
         else:
             statement = self.assignment()
 
-        self.statements.append(statement)
         self.speaking = None
+        return statement
 
     def goto(self):
         self.eat(TokenTypes.Goto)
@@ -204,14 +217,14 @@ class Parser(object):
         # Ignore everything up to and including the first full stop.
         while self.current_token.type != TokenTypes.EndLine:
             self.next_token()
-        self.next_token()
+        self.eat(TokenTypes.EndLine)
 
+        children = []
         while self.current_token.type != TokenTypes.Act:
-            self.var_assignment()
+            children.append(self.var_assignment())
 
-        self.act()
-
+        children.append(self.act())
         while self.current_token.type != TokenTypes.Eof:
-            self.act()
+            children.append(self.act())
 
-        return self.vars_table, self.statements
+        return self.vars_table, Label(scene=False, name="", children=children)

@@ -26,17 +26,14 @@ if __name__ == "__main__":
     spl_parser = Parser(args.input)
 
     try:
-        var_initializations, statements = spl_parser.play()
+        var_initializations, ast = spl_parser.play()
     except SPLSyntaxError as e:
         print("Syntax error: {}".format(e))
         sys.exit(1)
 
     try:
         cls_builder = Builder(args.cls_name)
-        
-        for statement in statements:
-            cls_builder.ast_dump(statement)
-
+        cls_builder.ast_dump(ast)
         cls = cls_builder.build()
     except CompilationError as e:
         print("Compiler error: {}".format(e))

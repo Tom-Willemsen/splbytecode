@@ -8,6 +8,11 @@ class AstNode(object):
         return []
 
 
+class NoOp(AstNode):
+    def __str__(self):
+        return "No-op"
+
+
 class Assign(AstNode):
     def __init__(self, var, expr_tree, dynamic=True):
         self.var = var
@@ -16,9 +21,6 @@ class Assign(AstNode):
 
     def __str__(self):
         return "({} Assign '{}' to {})".format("Dynamic" if self.dynamic else "Static", self.var, self.expr_tree)
-
-    def __repr__(self):
-        return str(self)
 
     def get_children(self):
         return [self.expr_tree]
@@ -82,3 +84,16 @@ class Goto(AstNode):
 
     def __str__(self):
         return "(Goto act={} scene={})".format(self.act, self.scene)
+
+
+class Label(AstNode):
+    def __init__(self, scene, name, children):
+        self.is_scene = scene
+        self.name = name
+        self.children = children
+
+    def get_children(self):
+        return self.children
+
+    def __str__(self):
+        return "(Label is_scene={} name={})".format(self.is_scene, self.name)
