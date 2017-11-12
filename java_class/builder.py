@@ -1,4 +1,4 @@
-from java_class import access_modifiers, instructions
+from java_class import access_modifiers, instructions, flow
 from java_class.java_class import JavaClass
 from spl.ast import BinaryOperator, Operators, Value, Assign, DynamicValue, AstNode, PrintVariable, InputVariable, Goto, \
     Label, NoOp
@@ -38,6 +38,9 @@ class Builder(object):
         This methods performs final transformations before export.
         """
         self.main_method_instructions.append(instructions.voidreturn())
+
+        self.main_method_instructions = flow.Goto.compute_gotos(self.main_method_instructions)
+
         self.output_class.add_method("main", "([Ljava/lang/String;)V", Builder.MAIN_METHOD_ACCESS_MODIFIERS,
                                      self.main_method_instructions)
 
@@ -159,9 +162,9 @@ class Builder(object):
         elif isinstance(tree, InputVariable):
             self.input_to_field(tree.field, tree.as_char)
         elif isinstance(tree, Goto):
-            self.main_method_instructions.append(instructions.goto(-10))
+            self.main_method_instructions.append(flow.Goto(tree.name, False))
         elif isinstance(tree, Label):
-            print(str(tree))
+            self.main_method_instructions.append(flow.Goto(tree.name, True))
         elif isinstance(tree, NoOp):
             pass
         else:

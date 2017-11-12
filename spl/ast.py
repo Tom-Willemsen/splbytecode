@@ -78,17 +78,15 @@ class InputVariable(AstNode):
 
 
 class Goto(AstNode):
-    def __init__(self, act, scene):
-        self.act = act
-        self.scene = scene
+    def __init__(self, name):
+        self.name = name
 
     def __str__(self):
-        return "(Goto act={} scene={})".format(self.act, self.scene)
+        return "(Goto name={})".format(self.name)
 
 
 class Label(AstNode):
-    def __init__(self, scene, name, children):
-        self.is_scene = scene
+    def __init__(self, name, children):
         self.name = name
         self.children = children
 
@@ -96,4 +94,4 @@ class Label(AstNode):
         return self.children
 
     def __str__(self):
-        return "(Label is_scene={} name={})".format(self.is_scene, self.name)
+        return "(Label name={})".format(self.name)

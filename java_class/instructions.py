@@ -79,8 +79,9 @@ def invokestatic(ref):
     return u1(0xB8) + u2(ref)
 
 
-def goto(offset):
-    if -127 <= offset <= 127:
-        return u1(0xA7) + u2(offset, signed=True)  # goto
-    else:
-        return u1(0xC8) + u4(offset, signed=True)  # goto_w
+def goto_w(offset):
+    return u1(0xC8) + u4(offset, signed=True)
+
+
+def nop():
+    return u1(0)
