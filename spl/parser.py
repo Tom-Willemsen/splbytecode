@@ -29,7 +29,6 @@ class Parser(object):
 
     def next_token(self):
         self.current_token = next(self.tokens, None)
-        print(self.current_token)
         return self.current_token
 
     def eat(self, token_type):
