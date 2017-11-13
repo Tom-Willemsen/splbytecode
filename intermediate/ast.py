@@ -1,11 +1,14 @@
-class Operators(object):
-    MULTIPLY = "*"
-    ADD = "+"
-
-
 class AstNode(object):
     def get_children(self):
         return []
+
+    def __repr__(self):
+        return str(self)
+
+
+class NoOp(AstNode):
+    def __str__(self):
+        return "No-op"
 
 
 class Assign(AstNode):
@@ -16,9 +19,6 @@ class Assign(AstNode):
 
     def __str__(self):
         return "({} Assign '{}' to {})".format("Dynamic" if self.dynamic else "Static", self.var, self.expr_tree)
-
-    def __repr__(self):
-        return str(self)
 
     def get_children(self):
         return [self.expr_tree]
@@ -73,3 +73,23 @@ class InputVariable(AstNode):
 
     def __str__(self):
         return "(input to field '{}')".format(self.field)
+
+
+class Goto(AstNode):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return "(Goto name={})".format(self.name)
+
+
+class Label(AstNode):
+    def __init__(self, name, children):
+        self.name = name
+        self.children = children
+
+    def get_children(self):
+        return self.children
+
+    def __str__(self):
+        return "(Label name={})".format(self.name)
