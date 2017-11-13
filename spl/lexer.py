@@ -90,17 +90,6 @@ class Lexer(object):
             self.pos += 1
             return Token(TokenTypes.NoOp)
 
-    def text_starts_with_any_of(self, ls):
-        for item in ls:
-            if self.text_starts_with_item(item)[0]:
-                return True, self.text_starts_with_item(item)[1]
-        return False, None
-
-    def text_starts_with_item(self, item):
-        if self.text[self.pos:].startswith(item):
-            return True, item
-        return False, None
-
     def text_starts_with_regex(self, rx):
         match = re.search("^{}".format(rx), self.text[self.pos:])
         if match:
