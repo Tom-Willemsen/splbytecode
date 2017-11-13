@@ -16,8 +16,9 @@ class Parser(object):
         self.vars_table = []  # List of variable names declared.
         self.statements = []  # List of statements to be executed
 
-        self.onstage = []  # List of characters currently on stage (for figuring out who "you" is...)
+        self.onstage = []  # List of characters currently on stage (for figuring out who thyself is...)
         self.speaking = None  # Character currently speaking
+        self.current_act = None  # ID of current act. None = not in an act yet.
 
     def get_character_being_spoken_to(self):
         if len(self.onstage) != 2:
