@@ -149,7 +149,7 @@ class Lexer(object):
             return Token(TokenTypes.Exeunt)
 
         # numerals
-        found, text = self.text_starts_with_regex("[ivx]+")
+        found, text = self.text_starts_with_regex(" ([ivx]+)[.:]")
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Numeral, text)
@@ -171,5 +171,5 @@ class Lexer(object):
     def text_starts_with_regex(self, rx):
         match = re.search("^{}".format(rx), self.text[self.pos:])
         if match:
-            return True, match.group(0)
+            return True, match.group(1)
         return False, None
