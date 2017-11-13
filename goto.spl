@@ -1,11 +1,11 @@
-A simple example demonstrating getting numeric input, adding one to it, and printing the result.
+A goto program.
 
 Romeo, a goat.
 Juliet, a lady.
 
-Act I: Getting incrementally closer.
+Act I: Going to other scenes.
 
-Scene I: The one and only scene.
+Scene I: The first scene.
 
 [Enter Romeo and Juliet]
 Romeo: Open your heart!
@@ -13,13 +13,13 @@ Romeo: You are thyself and a king.
 Romeo: Let us proceed to Scene III.
 [Exeunt]
 
-Scene II: The one and only scene.
+Scene II: The skipped scene.
 
 [Enter Romeo and Juliet]
 Romeo: Open your heart!
 [Exeunt]
 
-Scene III: The one and only scene.
+Scene III: The target scene.
 
 [Enter Romeo and Juliet]
 [Exeunt]
