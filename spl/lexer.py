@@ -1,4 +1,7 @@
-from spl.ast import Operators
+import re
+
+from intermediate import operators
+from intermediate.operators import Operators
 from spl.tokens import Token, TokenTypes
 
 
@@ -29,127 +32,69 @@ class Lexer(object):
 
     def get_next_token(self):
 
-        # Act
-        found, text = self.text_starts_with_item("act")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Act)
+        mapping = {
+            "(act)":
+                lambda: Token(TokenTypes.Act),
+            "(scene)":
+                lambda: Token(TokenTypes.Scene),
+            "(speak your mind)":
+                lambda: Token(TokenTypes.Print, True),
+            "(open your heart)":
+                lambda: Token(TokenTypes.Print, False),
+            "(open your mind)":
+                lambda: Token(TokenTypes.Input, True),
+            "(listen to your heart)":
+                lambda: Token(TokenTypes.Input, False),
+            "(let us proceed to |let us return to )":
+                lambda: Token(TokenTypes.Goto, text),
+            "({})".format("|".join(self.names)):
+                lambda: Token(TokenTypes.Name, text),
+            "({})".format("|".join(self.adjectives)):
+                lambda: Token(TokenTypes.Adj, 2),
+            "({})".format("|".join(self.nouns)):
+                lambda: Token(TokenTypes.Noun, 1),
+            "({})".format("|".join(self.negative_nouns)):
+                lambda: Token(TokenTypes.Noun, -1),
+            "(with|and)":
+                lambda: Token(TokenTypes.Add, value=operators.Operators.ADD),
+            "(\.|!)":
+                lambda: Token(TokenTypes.EndLine),
+            "(,)":
+                lambda: Token(TokenTypes.Comma),
+            "(\[)":
+                lambda: Token(TokenTypes.OpenSqBracket),
+            "(\])":
+                lambda: Token(TokenTypes.CloseSqBracket),
+            "(:)":
+                lambda: Token(TokenTypes.Colon),
+            "(you|thyself)":
+                lambda: Token(TokenTypes.SecondPronoun),
+            "(i |myself)":
+                lambda: Token(TokenTypes.FirstPronoun),
+            "(enter)":
+                lambda: Token(TokenTypes.Enter),
+            "(exit)":
+                lambda: Token(TokenTypes.Exit),
+            "(exeunt)":
+                lambda: Token(TokenTypes.Exeunt),
+            " ([ivx]+)[.:]":
+                lambda: Token(TokenTypes.Numeral, text)
+        }
 
-        # Scene
-        found, text = self.text_starts_with_item("scene")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Scene)
-
-        found, text = self.text_starts_with_item("speak your mind")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Print, True)
-
-        found, text = self.text_starts_with_item("open your heart")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Print, False)
-
-        found, text = self.text_starts_with_item("open your mind")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Input, True)
-
-        found, text = self.text_starts_with_item("listen to your heart")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Input, False)
-
-        # Names
-        found, text = self.text_starts_with_any_of(self.names)
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Name, text)
-
-        # Adjectives
-        found, text = self.text_starts_with_any_of(self.adjectives)
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Adj, 2)
-
-        # Nouns
-        found, text = self.text_starts_with_any_of(self.nouns)
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Noun, 1)
-
-        found, text = self.text_starts_with_any_of(self.negative_nouns)
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Noun, -1)
-
-        found, text = self.text_starts_with_any_of(["with", "and"])
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Add, value=Operators.ADD)
-
-        found, text = self.text_starts_with_any_of([".", "!"])
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.EndLine)
-
-        if self.text_starts_with_item(",")[0]:
+        for regexp in mapping:
+            match, text = self.text_starts_with_regex(regexp)
+            if match:
+                self.pos += len(text)
+                return mapping[regexp]()
+        else:
             self.pos += 1
-            return Token(TokenTypes.Comma)
+            return Token(TokenTypes.NoOp)
 
-        if self.text_starts_with_item("[")[0]:
-            self.pos += 1
-            return Token(TokenTypes.OpenSqBracket)
-
-        if self.text_starts_with_item("]")[0]:
-            self.pos += 1
-            return Token(TokenTypes.CloseSqBracket)
-
-        if self.text_starts_with_item(":")[0]:
-            self.pos += 1
-            return Token(TokenTypes.Colon)
-
-        # Second person pronouns
-        found, text = self.text_starts_with_any_of(["you", "thyself"])
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.SecondPronoun)
-
-        # First person pronouns
-        found, text = self.text_starts_with_any_of(["I", "myself"])
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.FirstPronoun)
-
-        # enter
-        found, text = self.text_starts_with_item("enter")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Enter)
-
-        # exit
-        found, text = self.text_starts_with_item("exit")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Exit)
-
-        # exeunt
-        found, text = self.text_starts_with_item("exeunt")
-        if found:
-            self.pos += len(text)
-            return Token(TokenTypes.Exeunt)
-
-        self.pos += 1
-        return Token(TokenTypes.NoOp)
-
-    def text_starts_with_any_of(self, ls):
-        for item in ls:
-            if self.text_starts_with_item(item)[0]:
-                return True, self.text_starts_with_item(item)[1]
-        return False, None
-
-    def text_starts_with_item(self, item):
-        if self.text[self.pos:].startswith(item):
-            return True, item
+    def text_starts_with_regex(self, rx):
+        match = re.search("^{}".format(rx), self.text[self.pos:])
+        if match:
+            try:
+                return True, match.group(1)
+            except IndexError:
+                return False, None
         return False, None

@@ -1,4 +1,4 @@
-from java_class.byte_utils import u1, u2
+from java_class.byte_utils import u1, u2, u4, s4, s1
 
 
 def voidreturn():
@@ -27,7 +27,7 @@ def bipush(value):
     elif value == 2:
         return u1(0x5)  # iconst_2
     else:
-        return u1(0x10) + u1(value, signed=True)
+        return u1(0x10) + s1(value)
 
 
 def swap():
@@ -77,3 +77,11 @@ def aaload():
 
 def invokestatic(ref):
     return u1(0xB8) + u2(ref)
+
+
+def goto_w(offset):
+    return u1(0xC8) + s4(offset)
+
+
+def nop():
+    return u1(0)
