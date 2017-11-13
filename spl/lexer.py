@@ -1,4 +1,6 @@
-from intermediate.ast import Operators
+import re
+
+from intermediate.operators import Operators
 from spl.tokens import Token, TokenTypes
 
 
@@ -62,7 +64,7 @@ class Lexer(object):
             return Token(TokenTypes.Input, False)
 
         # goto
-        found, text = self.text_starts_with_any_of(["let us proceed to", "let us return to"])
+        found, text = self.text_starts_with_any_of(["let us proceed to ", "let us return to "])
         if found:
             self.pos += len(text)
             return Token(TokenTypes.Goto)
@@ -123,7 +125,7 @@ class Lexer(object):
             return Token(TokenTypes.SecondPronoun)
 
         # First person pronouns
-        found, text = self.text_starts_with_any_of(["I", "myself"])
+        found, text = self.text_starts_with_any_of(["I ", "myself"])
         if found:
             self.pos += len(text)
             return Token(TokenTypes.FirstPronoun)
@@ -146,6 +148,12 @@ class Lexer(object):
             self.pos += len(text)
             return Token(TokenTypes.Exeunt)
 
+        # numerals
+        found, text = self.text_starts_with_regex("[ivx]+")
+        if found:
+            self.pos += len(text)
+            return Token(TokenTypes.Numeral, text)
+
         self.pos += 1
         return Token(TokenTypes.NoOp)
 
@@ -158,4 +166,10 @@ class Lexer(object):
     def text_starts_with_item(self, item):
         if self.text[self.pos:].startswith(item):
             return True, item
+        return False, None
+
+    def text_starts_with_regex(self, rx):
+        match = re.search("^{}".format(rx), self.text[self.pos:])
+        if match:
+            return True, match.group(0)
         return False, None

@@ -1,5 +1,4 @@
-from intermediate.ast import Assign, Operators, BinaryOperator, Value, DynamicValue, PrintVariable, InputVariable, Goto, Label, \
-    NoOp
+from intermediate import ast, operators
 from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
@@ -18,6 +17,7 @@ class Parser(object):
 
         self.onstage = []  # List of characters currently on stage (for figuring out who "you" is...)
         self.speaking = None  # Character currently speaking
+        self.current_act = None
 
     def get_character_being_spoken_to(self):
         if len(self.onstage) != 2:
@@ -48,29 +48,29 @@ class Parser(object):
 
     def term(self):
         if self.current_token.type == TokenTypes.Adj:
-            return BinaryOperator(Value(self.eat(TokenTypes.Adj)), Operators.MULTIPLY, self.term())
+            return ast.BinaryOperator(ast.Value(self.eat(TokenTypes.Adj)), operators.Operators.MULTIPLY, self.term())
         elif self.current_token.type == TokenTypes.Name:
-            return DynamicValue(self.eat(TokenTypes.Name))
+            return ast.DynamicValue(self.eat(TokenTypes.Name))
         elif self.current_token.type == TokenTypes.SecondPronoun:
             self.eat(TokenTypes.SecondPronoun)
-            return DynamicValue(self.get_character_being_spoken_to())
+            return ast.DynamicValue(self.get_character_being_spoken_to())
         elif self.current_token.type == TokenTypes.FirstPronoun:
             self.eat(TokenTypes.FirstPronoun)
-            return DynamicValue(self.get_character_being_spoken_to())
+            return ast.DynamicValue(self.get_character_being_spoken_to())
         else:
-            return Value(self.eat(TokenTypes.Noun))
+            return ast.Value(self.eat(TokenTypes.Noun))
 
     def expr(self):
         left = self.term()
         if self.current_token.type == TokenTypes.Add:
-            return BinaryOperator(left, self.eat(TokenTypes.Add), self.expr())
+            return ast.BinaryOperator(left, self.eat(TokenTypes.Add), self.expr())
         elif self.current_token.type == TokenTypes.Adj:
-            return BinaryOperator(left, Operators.ADD, self.expr())
+            return ast.BinaryOperator(left, operators.Operators.ADD, self.expr())
         elif self.current_token.type == TokenTypes.EndLine:
             self.eat(TokenTypes.EndLine)
             return left
         else:
-            op = BinaryOperator(left, Operators.ADD, self.expr())
+            op = ast.BinaryOperator(left, operators.Operators.ADD, self.expr())
             return op
 
     def var_assignment(self):
@@ -81,26 +81,29 @@ class Parser(object):
         if name in self.vars_table:
             raise SPLSyntaxError("Redeclaring variables is not allowed ('{}').".format(name))
         self.vars_table.append(name)
-        return Assign(name, value, dynamic=False)
+        return ast.Assign(name, value, dynamic=False)
 
     def act(self):
         self.eat(TokenTypes.Act)
+        id = self.eat(TokenTypes.Numeral)
+        self.eat(TokenTypes.Colon)
+
         while self.current_token.type != TokenTypes.EndLine:
-            self.next_token()
+            self.eat(self.current_token.type)
         self.eat(TokenTypes.EndLine)
+
+        self.current_act = id
 
         children = [self.scene()]
 
         while self.current_token.type != TokenTypes.Eof and self.current_token.type != TokenTypes.Act:
             children.append(self.scene())
 
-        return Label(name="act", children=children)
+        return ast.Label(name="act {}".format(id), children=children)
 
     def scene(self):
         self.eat(TokenTypes.Scene)
-        id = ""
-        while self.current_token.type != TokenTypes.Colon:
-            id += self.eat(self.current_token.type)
+        id = self.eat(TokenTypes.Numeral)
         self.eat(TokenTypes.Colon)
 
         while self.current_token.type != TokenTypes.EndLine:
@@ -117,12 +120,12 @@ class Parser(object):
         if len(self.onstage) != 0:
             raise SPLSyntaxError("Cannot have characters left on stage at the end of a scene")
 
-        return Label(name="scene", children=children)
+        return ast.Label(name="act {} scene {}".format(self.current_act, id), children=children)
 
     def statement(self):
         if self.current_token.type == TokenTypes.OpenSqBracket:
             self.stagecontrol()
-            return NoOp()
+            return ast.NoOp()
         else:
             return self.speech()
 
@@ -171,11 +174,11 @@ class Parser(object):
 
         if self.current_token.type == TokenTypes.Print:
             as_char = self.eat(TokenTypes.Print)
-            statement = PrintVariable(self.get_character_being_spoken_to(), as_char)
+            statement = ast.PrintVariable(self.get_character_being_spoken_to(), as_char)
             self.eat(TokenTypes.EndLine)
         elif self.current_token.type == TokenTypes.Input:
             as_char = self.eat(TokenTypes.Input)
-            statement = InputVariable(self.get_character_being_spoken_to(), as_char)
+            statement = ast.InputVariable(self.get_character_being_spoken_to(), as_char)
             self.eat(TokenTypes.EndLine)
         elif self.current_token.type == TokenTypes.Goto:
             statement = self.goto()
@@ -190,10 +193,12 @@ class Parser(object):
         self.eat(TokenTypes.Goto)
         if self.current_token.type == TokenTypes.Act:
             self.eat(TokenTypes.Act)
-            return Goto(name="act")
+            id = self.eat(TokenTypes.Numeral)
+            return ast.Goto(name="act {}".format(id))
         elif self.current_token.type == TokenTypes.Scene:
             self.eat(TokenTypes.Scene)
-            return Goto(name="scene")
+            id = self.eat(TokenTypes.Numeral)
+            return ast.Goto(name="act {} scene {}".format(self.current_act, id))
         else:
             raise SPLSyntaxError("Expected act or scene, got {}".format(self.current_token.type))
 
@@ -211,7 +216,7 @@ class Parser(object):
             raise SPLSyntaxError("Cannot reference an undeclared character ('{}')".format(self.speaking))
 
         expr_tree = self.expr()
-        return Assign(spoken_to, expr_tree)
+        return ast.Assign(spoken_to, expr_tree)
 
     def play(self):
         # Ignore everything up to and including the first full stop.
@@ -227,4 +232,4 @@ class Parser(object):
         while self.current_token.type != TokenTypes.Eof:
             children.append(self.act())
 
-        return Label(name="play", children=children)
+        return ast.Label(name="play", children=children)

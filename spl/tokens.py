@@ -38,3 +38,4 @@ class TokenTypes(object):
     Print = "Print"
     Input = "Input"
     Goto = "Goto"
+    Numeral = "Numeral"

@@ -28,22 +28,43 @@ def int_to_bytes(i, l, signed):
     return int(i).to_bytes(l, 'big', signed=signed)
 
 
-def u1(i, signed=False):
+def u1(i):
     """
-    Java class file u1 type
+    1 byte unsigned int
     """
-    return int_to_bytes(i, 1, signed)
+    return int_to_bytes(i, 1, False)
 
 
-def u2(i, signed=False):
+def u2(i):
     """
-    Java class file u2 type
+    2 byte unsigned int
     """
-    return int_to_bytes(i, 2, signed)
+    return int_to_bytes(i, 2, False)
 
 
-def u4(i, signed=False):
+def u4(i):
     """
-    Java class file u4 type
+    4 byte unsigned int
     """
-    return int_to_bytes(i, 4, signed)
+    return int_to_bytes(i, 4, False)
+
+
+def s1(i):
+    """
+    1 byte signed int
+    """
+    return int_to_bytes(i, 1, True)
+
+
+def s2(i):
+    """
+    2 byte signed int
+    """
+    return int_to_bytes(i, 2, True)
+
+
+def s4(i):
+    """
+    4 byte signed int
+    """
+    return int_to_bytes(i, 4, True)

@@ -1,8 +1,3 @@
-class Operators(object):
-    MULTIPLY = "*"
-    ADD = "+"
-
-
 class AstNode(object):
     def get_children(self):
         return []
