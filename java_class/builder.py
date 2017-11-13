@@ -42,7 +42,7 @@ class Builder(object):
         try:
             code = Builder._compute_gotos(self.code)
         except KeyError as e:
-            raise CompilationError("Couldn't compute gotos because: {}".format(e))
+            raise CompilationError("Couldn't compute gotos because label '{}' was invalid.".format(e))
 
         self.output_class.add_method("main", "([Ljava/lang/String;)V", Builder.MAIN_METHOD_ACCESS_MODIFIERS, code)
 
