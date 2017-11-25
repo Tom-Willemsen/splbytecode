@@ -65,18 +65,16 @@ class Builder(object):
         labels = {}
 
         for instruction in code:
-            if isinstance(instruction, Goto) and instruction.destination:
-                idx = code.index(Goto(instruction.name, True))
+            if isinstance(instruction, Label):
+                idx = code.index(instruction)
                 labels[instruction.name] = length_of_code_up_to_instruction(idx)
                 code[idx] = instructions.nop()
 
         for instruction in code:
-            if isinstance(instruction, Goto) and not instruction.destination:
+            if isinstance(instruction, Goto):
                 idx = code.index(instruction)
-                code[idx] = goto_w(labels[instruction.name] - length_of_code_up_to_instruction(idx))
-            if isinstance(instruction, ConditionalGoto) and not instruction.destination:
-                idx = code.index(instruction)
-                code[idx] = ifeq(labels[instruction.name] - length_of_code_up_to_instruction(idx))
+                offset = labels[instruction.name] - length_of_code_up_to_instruction(idx)
+                code[idx] = ifeq(offset) if instruction.conditional else goto_w(offset)
 
         return code
 
@@ -177,14 +175,14 @@ class Builder(object):
 
     def _add_conditional_goto(self, name):
         self._push_field_value_onto_stack(Builder.CONDITIONAL)
-        self.code.append(ConditionalGoto(name, False))
+        self.code.append(Goto(name, True))
 
     def asl_dump(self, asl):
 
         mapping = {
-            ast.Goto: lambda: self.code.append(Goto(item.name, False)),
+            ast.Goto: lambda: self.code.append(Goto(item.name)),
             ast.ConditionalGoto: lambda: self._add_conditional_goto(item.name),
-            ast.Label: lambda: self.code.append(Goto(item.name, True)),
+            ast.Label: lambda: self.code.append(Label(item.name)),
             ast.BinaryOperator: lambda: self._add_operator_instruction_from_node(item),
             ast.Value: lambda: self.code.append(instructions.bipush(item.value)),
             ast.DynamicValue: lambda: self._push_field_value_onto_stack(item.field),
@@ -207,28 +205,22 @@ class Builder(object):
 
 
 class Goto(object):
-    def __init__(self, name, destination):
+    def __init__(self, name, conditional=False):
         self.name = name
-        self.destination = destination
+        self.conditional = conditional
 
     def __len__(self):
-        return len(instructions.nop() if self.destination else instructions.goto_w(0))
-
-    def __eq__(self, other):
-        if not isinstance(other, Goto):
-            return False
-        return self.name == other.name and self.destination == other.destination
+        return len(instructions.ifeq(0) if self.conditional else instructions.goto_w(0))
 
 
-class ConditionalGoto(object):
-    def __init__(self, name, destination):
+class Label(object):
+    def __init__(self, name):
         self.name = name
-        self.destination = destination
 
     def __len__(self):
-        return len(instructions.nop() if self.destination else instructions.ifeq(0))
+        return len(instructions.nop())
 
     def __eq__(self, other):
-        if not isinstance(other, ConditionalGoto):
+        if not isinstance(other, Label):
             return False
-        return self.name == other.name and self.destination == other.destination
+        return self.name == other.name

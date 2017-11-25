@@ -108,8 +108,5 @@ class Compare(AstNode):
         self.var1 = var1
         self.var2 = var2
 
-    def get_children(self):
-        return []
-
     def __str__(self):
         return "(Compare {} and {})".format(self.var1, self.var2)

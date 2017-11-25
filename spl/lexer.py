@@ -86,7 +86,7 @@ class Lexer(object):
                 lambda: Token(TokenTypes.IfSo),
             " ([ivx]+)[.:]":
                 lambda: Token(TokenTypes.Numeral, text),
-            "(are|is|am) (?:{0}|{1}|{2}) (?:equal to) (?:{0}|{1}|{2})\?"
+            "(are|is|am) (?:{0}|{1}|{2}) ?(?:equal to) (?:{0}|{1}|{2})\?"
                 .format("|".join(FIRST_PERSON_PRONOUNS), "|".join(SECOND_PERSON_PRONOUNS), "|".join(self.names)):
                 lambda: Token(TokenTypes.QuestionStart),
         }

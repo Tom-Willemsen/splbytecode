@@ -19,14 +19,6 @@ class Parser(object):
         self.speaking = None  # Character currently speaking
         self.current_act = None  # ID of current act. None = not in an act yet.
 
-    def get_character_being_spoken_to(self):
-        if len(self.onstage) != 2:
-            raise SPLSyntaxError("There must be exactly 2 characters on stage to speak to someone")
-        assert self.speaking is not None
-        char = list(c for c in self.onstage if c != self.speaking)
-        assert len(char) == 1
-        return char[0]
-
     def next_token(self):
         self.current_token = next(self.tokens, None)
         return self.current_token
@@ -46,17 +38,34 @@ class Parser(object):
     def adjective(self):
         return self.eat(TokenTypes.Adj)
 
+    def character_name(self):
+        if self.current_token.type == TokenTypes.Name:
+            return self.eat(TokenTypes.Name)
+        elif self.current_token.type == TokenTypes.SecondPronoun:
+            self.eat(TokenTypes.SecondPronoun)
+            return self.get_character_being_spoken_to()
+        elif self.current_token.type == TokenTypes.FirstPronoun:
+            self.eat(TokenTypes.FirstPronoun)
+            return self.speaking
+        else:
+            raise SPLSyntaxError("Expected a character or pronoun.")
+
+    def _is_current_token_character(self):
+        return self.current_token.type in (TokenTypes.Name, TokenTypes.FirstPronoun, TokenTypes.SecondPronoun)
+
+    def get_character_being_spoken_to(self):
+        if len(self.onstage) != 2:
+            raise SPLSyntaxError("There must be exactly 2 characters on stage to speak to someone")
+        assert self.speaking is not None
+        char = list(c for c in self.onstage if c != self.speaking)
+        assert len(char) == 1
+        return char[0]
+
     def term(self):
         if self.current_token.type == TokenTypes.Adj:
             return ast.BinaryOperator(ast.Value(self.eat(TokenTypes.Adj)), operators.Operators.MULTIPLY, self.term())
-        elif self.current_token.type == TokenTypes.Name:
-            return ast.DynamicValue(self.eat(TokenTypes.Name))
-        elif self.current_token.type == TokenTypes.SecondPronoun:
-            self.eat(TokenTypes.SecondPronoun)
-            return ast.DynamicValue(self.get_character_being_spoken_to())
-        elif self.current_token.type == TokenTypes.FirstPronoun:
-            self.eat(TokenTypes.FirstPronoun)
-            return ast.DynamicValue(self.speaking)
+        elif self._is_current_token_character():
+            return ast.DynamicValue(self.character_name())
         else:
             return ast.Value(self.eat(TokenTypes.Noun))
 
@@ -197,8 +206,8 @@ class Parser(object):
         return statement
 
     def question(self):
-        person1 = self.eat(TokenTypes.Name)
-        person2 = self.eat(TokenTypes.Name)
+        person1 = self.character_name()
+        person2 = self.character_name()
         if person1 not in self.vars_table or person2 not in self.vars_table:
             raise SPLSyntaxError("Cannot reference undeclared character.")
         return ast.Compare(person1, person2)
@@ -232,14 +241,7 @@ class Parser(object):
             raise SPLSyntaxError("Expected act or scene, got {}".format(self.current_token.type))
 
     def assignment(self):
-        if self.current_token.type == TokenTypes.FirstPronoun:
-            spoken_to = self.speaking
-            self.eat(TokenTypes.FirstPronoun)
-        elif self.current_token.type == TokenTypes.SecondPronoun:
-            spoken_to = self.get_character_being_spoken_to()
-            self.eat(TokenTypes.SecondPronoun)
-        else:
-            spoken_to = self.eat(TokenTypes.Name)
+        spoken_to = self.character_name()
 
         if spoken_to not in self.vars_table:
             raise SPLSyntaxError("Cannot reference an undeclared character ('{}')".format(self.speaking))
