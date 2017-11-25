@@ -1,7 +1,6 @@
 import re
 
 from intermediate import operators
-from intermediate.operators import Operators
 from spl.tokens import Token, TokenTypes
 
 
@@ -77,6 +76,8 @@ class Lexer(object):
                 lambda: Token(TokenTypes.Exit),
             "(exeunt)":
                 lambda: Token(TokenTypes.Exeunt),
+            "(if so)":
+                lambda: Token(TokenTypes.IfSo),
             " ([ivx]+)[.:]":
                 lambda: Token(TokenTypes.Numeral, text)
         }

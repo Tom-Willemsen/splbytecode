@@ -17,15 +17,19 @@ def str_to_byte(text):
     return result
 
 
-def int_to_bytes(i, l, signed):
+def int_to_bytes(i, length, signed):
     """
     Converts an integer to bytes.
     :param i: The integer to convert
-    :param l: The number of bytes to be used in the output.
+    :param length: The number of bytes to be used in the output.
     :param signed: Whether the output should be signed.
     :return: The integer as bytes with length l.
     """
-    return int(i).to_bytes(l, 'big', signed=signed)
+    byte = 2**8
+    if (not signed and not 0 <= i < byte**length) or (signed and not -byte**length <= 2*i < byte**length):
+        raise ValueError("Tried to convert an int which was too big ({} to length = {}).".format(i, length))
+
+    return int(i).to_bytes(length, 'big', signed=signed)
 
 
 def u1(i):

@@ -1,7 +1,7 @@
 from intermediate import ast, operators
 from java_class import access_modifiers, instructions
 from java_class.java_class import JavaClass
-from java_class.instructions import goto_w
+from java_class.instructions import goto_w, ifeq
 
 
 class CompilationError(Exception):
@@ -14,8 +14,11 @@ class Builder(object):
     (reading/writing from fields, invoking methods, etc).
     """
 
-    # Variable used to keep track of how many inputs have been "used up" from 'String[] args'
+    # Variable used to keep track of how many inputs have been "used up" from 'String[] args'.
     INPUT_INDEX = "$input_index"
+
+    # Variable used to keep track of the result of the last conditional statement.
+    CONDITIONAL = "$conditional"
 
     # Access modifier for all fields that this builder generates.
     FIELD_ACCESS_MODIFIERS = access_modifiers.PUBLIC | access_modifiers.STATIC
@@ -32,6 +35,7 @@ class Builder(object):
         self.code = []
 
         self.set_field(Builder.INPUT_INDEX, 0)
+        self.set_field(Builder.CONDITIONAL, 0)
 
     def build(self):
         """
@@ -70,6 +74,9 @@ class Builder(object):
             if isinstance(instruction, Goto) and not instruction.destination:
                 idx = code.index(instruction)
                 code[idx] = goto_w(labels[instruction.name] - length_of_code_up_to_instruction(idx))
+            if isinstance(instruction, ConditionalGoto) and not instruction.destination:
+                idx = code.index(instruction)
+                code[idx] = ifeq(labels[instruction.name] - length_of_code_up_to_instruction(idx))
 
         return code
 
@@ -169,10 +176,15 @@ class Builder(object):
 
         return self
 
+    def add_conditional_goto(self, name):
+        self.push_field_value_onto_stack(Builder.CONDITIONAL)
+        self.code.append(ConditionalGoto(name, False))
+
     def asl_dump(self, asl):
 
         mapping = {
             ast.Goto: lambda: self.code.append(Goto(item.name, False)),
+            ast.ConditionalGoto: lambda: self.add_conditional_goto(item.name),
             ast.Label: lambda: self.code.append(Goto(item.name, True)),
             ast.BinaryOperator: lambda: self.add_operator_instruction_from_node(item),
             ast.Value: lambda: self.code.append(instructions.bipush(item.value)),
@@ -204,5 +216,19 @@ class Goto(object):
 
     def __eq__(self, other):
         if not isinstance(other, Goto):
+            return False
+        return self.name == other.name and self.destination == other.destination
+
+
+class ConditionalGoto(object):
+    def __init__(self, name, destination):
+        self.name = name
+        self.destination = destination
+
+    def __len__(self):
+        return len(instructions.nop() if self.destination else instructions.ifeq(0))
+
+    def __eq__(self, other):
+        if not isinstance(other, ConditionalGoto):
             return False
         return self.name == other.name and self.destination == other.destination

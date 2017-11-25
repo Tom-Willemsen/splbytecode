@@ -1,4 +1,4 @@
-from java_class.byte_utils import u1, u2, u4, s4, s1
+from java_class.byte_utils import u1, u2, u4, s4, s1, s2
 
 
 def voidreturn():
@@ -81,6 +81,10 @@ def invokestatic(ref):
 
 def goto_w(offset):
     return u1(0xC8) + s4(offset)
+
+
+def ifeq(offset):
+    return u1(0x99) + s2(offset)
 
 
 def nop():

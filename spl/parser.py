@@ -183,6 +183,9 @@ class Parser(object):
         elif self.current_token.type == TokenTypes.Goto:
             statement = self.goto()
             self.eat(TokenTypes.EndLine)
+        elif self.current_token.type == TokenTypes.IfSo:
+            statement = self.conditional_goto()
+            self.eat(TokenTypes.EndLine)
         else:
             statement = self.assignment()
 
@@ -199,6 +202,21 @@ class Parser(object):
             self.eat(TokenTypes.Scene)
             id = self.eat(TokenTypes.Numeral)
             return ast.Goto(name="act {} scene {}".format(self.current_act, id))
+        else:
+            raise SPLSyntaxError("Expected act or scene, got {}".format(self.current_token.type))
+
+    def conditional_goto(self):
+        self.eat(TokenTypes.IfSo)
+        self.eat(TokenTypes.Comma)
+        self.eat(TokenTypes.Goto)
+        if self.current_token.type == TokenTypes.Act:
+            self.eat(TokenTypes.Act)
+            id = self.eat(TokenTypes.Numeral)
+            return ast.ConditionalGoto(name="act {}".format(id))
+        elif self.current_token.type == TokenTypes.Scene:
+            self.eat(TokenTypes.Scene)
+            id = self.eat(TokenTypes.Numeral)
+            return ast.ConditionalGoto(name="act {} scene {}".format(self.current_act, id))
         else:
             raise SPLSyntaxError("Expected act or scene, got {}".format(self.current_token.type))
 

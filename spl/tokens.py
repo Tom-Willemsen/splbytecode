@@ -39,3 +39,4 @@ class TokenTypes(object):
     Input = "Input"
     Goto = "Goto"
     Numeral = "Numeral"
+    IfSo = "IfSo"
