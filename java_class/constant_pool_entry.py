@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from java_class.byte_utils import str_to_byte, u1, u2
 
 """

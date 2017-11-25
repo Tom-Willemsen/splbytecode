@@ -1,5 +1,6 @@
+from __future__ import absolute_import
+
 from intermediate import ast, operators
-from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
 
