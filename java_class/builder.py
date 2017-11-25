@@ -34,8 +34,8 @@ class Builder(object):
         self.output_class = JavaClass(name)
         self.code = []
 
-        self.set_field(Builder.INPUT_INDEX, 0)
-        self.set_field(Builder.CONDITIONAL, 0)
+        self._set_field(Builder.INPUT_INDEX, 0)
+        self._set_field(Builder.CONDITIONAL, 0)
 
     def build(self):
         """
@@ -80,15 +80,14 @@ class Builder(object):
 
         return code
 
-    def set_field(self, name, value):
+    def _set_field(self, name, value):
         """
         Sets a field with a constant value.
         """
         self.code.append(instructions.bipush(value))
-        self.set_field_with_value_from_top_of_stack(name)
-        return self
+        self._set_field_with_value_from_top_of_stack(name)
 
-    def set_field_with_value_from_top_of_stack(self, name):
+    def _set_field_with_value_from_top_of_stack(self, name):
         """
         Sets a field to have the value at the top of the stack.
         """
@@ -96,9 +95,8 @@ class Builder(object):
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
 
         self.code.append(instructions.putstatic(field_ref))
-        return self
 
-    def integer_at_top_of_stack_to_sysout(self, as_char):
+    def _integer_at_top_of_stack_to_sysout(self, as_char):
         """
         The integer at the top of the stack is popped and printed to standard out.
 
@@ -116,30 +114,27 @@ class Builder(object):
             self.code.append(instructions.i2c())
 
         self.code.append(instructions.invokevirtual(sysout))
-        return self
 
-    def multiply_integer_at_top_of_stack_by_two(self):
+    def _multiply_integer_at_top_of_stack_by_two(self):
         self.code.extend([
             instructions.bipush(2),
             instructions.imul(),
         ])
-        return self
 
-    def push_field_value_onto_stack(self, name):
+    def _push_field_value_onto_stack(self, name):
         # Ensures the field exists otherwise getting it will cause a runtime error.
         self.output_class.add_field(name, "I", Builder.FIELD_ACCESS_MODIFIERS)
 
         field_ref = self.output_class.pool.add_field_ref(self.name, name, "I")
         self.code.append(instructions.getstatic(field_ref))
-        return self
 
-    def print_field(self, name, as_char):
-        self.push_field_value_onto_stack(name)
-        self.integer_at_top_of_stack_to_sysout(as_char)
+    def _print_field(self, name, as_char):
+        self._push_field_value_onto_stack(name)
+        self._integer_at_top_of_stack_to_sysout(as_char)
 
-    def input_to_field(self, name, as_char):
+    def _input_to_field(self, name, as_char):
         self.code.append(instructions.aload(0))
-        self.push_field_value_onto_stack(Builder.INPUT_INDEX)
+        self._push_field_value_onto_stack(Builder.INPUT_INDEX)
 
         self.code.append(instructions.aaload())
 
@@ -151,20 +146,18 @@ class Builder(object):
             parse_int = self.output_class.pool.add_method_ref("java/lang/Integer", "parseInt", "(Ljava/lang/String;)I")
             self.code.append(instructions.invokestatic(parse_int))
 
-        self.set_field_with_value_from_top_of_stack(name)
-        self.increment_field(Builder.INPUT_INDEX)
-        return self
+        self._set_field_with_value_from_top_of_stack(name)
+        self._increment_field(Builder.INPUT_INDEX)
 
-    def increment_field(self, name):
-        self.push_field_value_onto_stack(name)
+    def _increment_field(self, name):
+        self._push_field_value_onto_stack(name)
         self.code.extend([
             instructions.bipush(1),
             instructions.iadd(),
         ])
-        self.set_field_with_value_from_top_of_stack(name)
-        return self
+        self._set_field_with_value_from_top_of_stack(name)
 
-    def add_operator_instruction_from_node(self, node):
+    def _add_operator_instruction_from_node(self, node):
         operator_mapping = {
             operators.Operators.ADD: instructions.iadd(),
             operators.Operators.MULTIPLY: instructions.imul(),
@@ -174,25 +167,32 @@ class Builder(object):
         except KeyError:
             raise CompilationError("No instruction specified to map {}".format(node.op))
 
-        return self
+    def _compare(self, field1, field2):
+        self._push_field_value_onto_stack(field1)
+        self.code.append(instructions.i2l())
+        self._push_field_value_onto_stack(field2)
+        self.code.append(instructions.i2l())
+        self.code.append(instructions.lcmp())
+        self._set_field_with_value_from_top_of_stack(Builder.CONDITIONAL)
 
-    def add_conditional_goto(self, name):
-        self.push_field_value_onto_stack(Builder.CONDITIONAL)
+    def _add_conditional_goto(self, name):
+        self._push_field_value_onto_stack(Builder.CONDITIONAL)
         self.code.append(ConditionalGoto(name, False))
 
     def asl_dump(self, asl):
 
         mapping = {
             ast.Goto: lambda: self.code.append(Goto(item.name, False)),
-            ast.ConditionalGoto: lambda: self.add_conditional_goto(item.name),
+            ast.ConditionalGoto: lambda: self._add_conditional_goto(item.name),
             ast.Label: lambda: self.code.append(Goto(item.name, True)),
-            ast.BinaryOperator: lambda: self.add_operator_instruction_from_node(item),
+            ast.BinaryOperator: lambda: self._add_operator_instruction_from_node(item),
             ast.Value: lambda: self.code.append(instructions.bipush(item.value)),
-            ast.DynamicValue: lambda: self.push_field_value_onto_stack(item.field),
-            ast.Assign: lambda: self.set_field_with_value_from_top_of_stack(item.var),
-            ast.PrintVariable: lambda: self.print_field(item.field, item.as_char),
-            ast.InputVariable: lambda: self.input_to_field(item.field, item.as_char),
-            ast.NoOp: lambda: None
+            ast.DynamicValue: lambda: self._push_field_value_onto_stack(item.field),
+            ast.Assign: lambda: self._set_field_with_value_from_top_of_stack(item.var),
+            ast.PrintVariable: lambda: self._print_field(item.field, item.as_char),
+            ast.InputVariable: lambda: self._input_to_field(item.field, item.as_char),
+            ast.NoOp: lambda: None,
+            ast.Compare: lambda: self._compare(item.var1, item.var2),
         }
 
         for item in asl:

@@ -4,23 +4,27 @@ from intermediate import operators
 from spl.tokens import Token, TokenTypes
 
 
+def list_from_file(filename):
+    result = []
+    with open(filename, "r") as f:
+        for line in f.readlines():
+            result.append(line.strip().lower())
+    return result
+
+
+FIRST_PERSON_PRONOUNS = ["i ", "myself"]
+SECOND_PERSON_PRONOUNS = ["you", "thyself"]
+
+
 class Lexer(object):
     def __init__(self, text):
         self.text = text.lower()
         self.pos = 0
 
-        self.names = Lexer.list_from_file("spl/words/characters.txt")
-        self.nouns = Lexer.list_from_file("spl/words/nouns.txt")
-        self.negative_nouns = Lexer.list_from_file("spl/words/negative_nouns.txt")
-        self.adjectives = Lexer.list_from_file("spl/words/adjectives.txt")
-
-    @staticmethod
-    def list_from_file(filename):
-        result = []
-        with open(filename, "r") as f:
-            for line in f.readlines():
-                result.append(line.strip().lower())
-        return result
+        self.names = list_from_file("spl/words/characters.txt")
+        self.nouns = list_from_file("spl/words/nouns.txt")
+        self.negative_nouns = list_from_file("spl/words/negative_nouns.txt")
+        self.adjectives = list_from_file("spl/words/adjectives.txt")
 
     def token_generator(self):
         while self.pos < len(self.text):
@@ -58,6 +62,8 @@ class Lexer(object):
                 lambda: Token(TokenTypes.Add, value=operators.Operators.ADD),
             "(\.|!)":
                 lambda: Token(TokenTypes.EndLine),
+            "(\?)":
+                lambda: Token(TokenTypes.QuestionMark),
             "(,)":
                 lambda: Token(TokenTypes.Comma),
             "(\[)":
@@ -66,9 +72,9 @@ class Lexer(object):
                 lambda: Token(TokenTypes.CloseSqBracket),
             "(:)":
                 lambda: Token(TokenTypes.Colon),
-            "(you|thyself)":
+            "({})".format("|".join(SECOND_PERSON_PRONOUNS)):
                 lambda: Token(TokenTypes.SecondPronoun),
-            "(i |myself)":
+            "({})".format("|".join(FIRST_PERSON_PRONOUNS)):
                 lambda: Token(TokenTypes.FirstPronoun),
             "(enter)":
                 lambda: Token(TokenTypes.Enter),
@@ -79,7 +85,10 @@ class Lexer(object):
             "(if so)":
                 lambda: Token(TokenTypes.IfSo),
             " ([ivx]+)[.:]":
-                lambda: Token(TokenTypes.Numeral, text)
+                lambda: Token(TokenTypes.Numeral, text),
+            "(are|is|am) (?:{0}|{1}|{2}) (?:equal to) (?:{0}|{1}|{2})\?"
+                .format("|".join(FIRST_PERSON_PRONOUNS), "|".join(SECOND_PERSON_PRONOUNS), "|".join(self.names)):
+                lambda: Token(TokenTypes.QuestionStart),
         }
 
         for regexp in mapping:

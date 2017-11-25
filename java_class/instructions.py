@@ -89,3 +89,11 @@ def ifeq(offset):
 
 def nop():
     return u1(0)
+
+
+def i2l():
+    return u1(0x85)
+
+
+def lcmp():
+    return u1(0x94)

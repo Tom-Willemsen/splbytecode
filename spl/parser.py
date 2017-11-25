@@ -186,11 +186,22 @@ class Parser(object):
         elif self.current_token.type == TokenTypes.IfSo:
             statement = self.conditional_goto()
             self.eat(TokenTypes.EndLine)
+        elif self.current_token.type == TokenTypes.QuestionStart:
+            self.eat(TokenTypes.QuestionStart)
+            statement = self.question()
+            self.eat(TokenTypes.QuestionMark)
         else:
             statement = self.assignment()
 
         self.speaking = None
         return statement
+
+    def question(self):
+        person1 = self.eat(TokenTypes.Name)
+        person2 = self.eat(TokenTypes.Name)
+        if person1 not in self.vars_table or person2 not in self.vars_table:
+            raise SPLSyntaxError("Cannot reference undeclared character.")
+        return ast.Compare(person1, person2)
 
     def goto(self):
         self.eat(TokenTypes.Goto)
