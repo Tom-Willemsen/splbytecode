@@ -205,6 +205,9 @@ class Builder(object):
 
 
 class Goto(object):
+    """
+    Placeholder instruction for GOTOs until they are computed.
+    """
     def __init__(self, name, conditional=False):
         self.name = name
         self.conditional = conditional
@@ -214,6 +217,9 @@ class Goto(object):
 
 
 class Label(object):
+    """
+    Placeholder instruction for GOTO jump points until they are computed and replaced with NOOPs.
+    """
     def __init__(self, name):
         self.name = name
 

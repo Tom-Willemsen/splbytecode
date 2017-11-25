@@ -18,7 +18,7 @@ class JavaClass(object):
             self.fields = []
 
             self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
-            self.version = (53, 0)  # JDK 9 by default
+            self.version = (50, 0)  # JDK 9 by default
 
     def set_version(self, major, minor=0):
         self.version = (major, minor)
@@ -44,7 +44,7 @@ class JavaClass(object):
         name_index = self.pool.get_index(utf8(name))
         descriptor_index = self.pool.get_index(utf8(descriptor))
 
-        field = Field(name_index, descriptor_index, access_flags, [])
+        field = Field(name_index, descriptor_index, access_flags)
         if field in self.fields:
             return
 
@@ -76,11 +76,10 @@ class Field(object):
     """
     Class representing a field in a .class file.
     """
-    def __init__(self, name_index, descriptor_index, access_flags, attributes):
+    def __init__(self, name_index, descriptor_index, access_flags):
         self.name_index = name_index
         self.descriptor_index = descriptor_index
         self.access_flags = access_flags
-        self.attributes = attributes
 
     def __eq__(self, other):
         return self.name_index == other.name_index and self.descriptor_index == other.descriptor_index
