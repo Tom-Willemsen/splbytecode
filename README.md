@@ -3,7 +3,7 @@ Shakespeare programming language to Java bytecode compiler.
 
 Hello, world:
 ```
-> python compiler.py hello.spl
+> python compiler.py examples/hello.spl
 > java SplProgram
 H
 E
