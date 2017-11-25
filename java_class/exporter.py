@@ -54,11 +54,10 @@ class Exporter(object):
             stream.write(u2(field.access_flags))
             stream.write(u2(field.name_index))
             stream.write(u2(field.descriptor_index))
-            stream.write(u2(len(field.attributes)))
 
             # Attributes table within field table
-            for _ in field.attributes:
-                raise NotImplementedError("Writing fields with attributes is not supported.")
+            assert len(field.attributes) == 0, "Writing fields with attributes has not been implemented."
+            stream.write(u2(len(field.attributes)))
 
         # Methods table
         stream.write(u2(len(self.output_class.methods)))
@@ -80,5 +79,5 @@ class Exporter(object):
                 stream.write(u2(0))  # Exception table not implemented
                 stream.write(u2(0))  # Attributes of attributes not implemented
 
-                # Attributes table (not implemented)
+        # Attributes table (not implemented)
         stream.write(u2(0))

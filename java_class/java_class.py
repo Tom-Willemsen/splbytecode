@@ -82,16 +82,5 @@ class Field(object):
         self.access_flags = access_flags
         self.attributes = attributes
 
-    def get_bytes(self):
-        result = u2(self.access_flags) \
-               + u2(self.name_index) \
-               + u2(self.descriptor_index) \
-               + u2(len(self.attributes))
-
-        for attribute in self.attributes:
-            result += attribute.get_bytes()
-
-        return result
-
     def __eq__(self, other):
         return self.name_index == other.name_index and self.descriptor_index == other.descriptor_index
