@@ -1,0 +1,29 @@
+A goto program.
+
+Romeo, a man.
+Juliet, a lady.
+Lady Macbeth, a fine beautiful noble woman.
+
+Act I: Setting up.
+
+Scene I: Asking what we should count up to.
+[Enter Romeo and Lady Macbeth]
+Romeo: Listen to your heart!
+[Exeunt]
+
+Act II: Going to other scenes.
+
+Scene I: Printing and incrementing.
+
+[Enter Romeo and Juliet]
+Juliet: Open your heart!
+Romeo: I am myself and a virgin.
+Romeo: Am I equal to Lady Macbeth?
+Romeo: If so, Let us proceed to Scene II.
+Juliet: Let us return to Scene I.
+[Exeunt]
+
+Scene II: Printing the very last number.
+[Enter Romeo and Juliet]
+Juliet: Open your heart!
+[Exeunt]

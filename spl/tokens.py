@@ -26,6 +26,7 @@ class TokenTypes(object):
     Noun = "Noun"
     Add = "Add"
     EndLine = "EndLine"
+    QuestionMark = "?"
     Comma = ","
     Colon = ":"
     OpenSqBracket = "["
@@ -39,3 +40,5 @@ class TokenTypes(object):
     Input = "Input"
     Goto = "Goto"
     Numeral = "Numeral"
+    IfSo = "IfSo"
+    QuestionStart = "QuestionStart"

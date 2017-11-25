@@ -83,6 +83,14 @@ class Goto(AstNode):
         return "(Goto name={})".format(self.name)
 
 
+class ConditionalGoto(AstNode):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return "(Conditional Goto name={})".format(self.name)
+
+
 class Label(AstNode):
     def __init__(self, name, children):
         self.name = name
@@ -93,3 +101,12 @@ class Label(AstNode):
 
     def __str__(self):
         return "(Label name={})".format(self.name)
+
+
+class Compare(AstNode):
+    def __init__(self, var1, var2):
+        self.var1 = var1
+        self.var2 = var2
+
+    def __str__(self):
+        return "(Compare {} and {})".format(self.var1, self.var2)
