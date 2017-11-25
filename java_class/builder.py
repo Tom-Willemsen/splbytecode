@@ -1,6 +1,6 @@
 from intermediate import ast, operators
 from java_class import access_modifiers, instructions
-from java_class.java_class import JavaClass
+from java_class.java_class import JavaClass, InvalidClassError
 from java_class.instructions import goto_w, ifeq
 
 
@@ -50,9 +50,10 @@ class Builder(object):
 
         self.output_class.add_method("main", "([Ljava/lang/String;)V", Builder.MAIN_METHOD_ACCESS_MODIFIERS, code)
 
-        valid, message = self.output_class.check_valid()
-        if not valid:
-            raise CompilationError("Can't build class: {}".format(message))
+        try:
+            self.output_class.check_valid()
+        except InvalidClassError as e:
+            raise CompilationError("Can't build class: {}".format(e))
 
         return self.output_class
 

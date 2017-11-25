@@ -5,6 +5,7 @@ import argparse
 from intermediate.asl import flatten_ast
 from java_class.builder import Builder, CompilationError
 from java_class.exporter import Exporter
+from spl.lexer import Lexer
 from spl.parser import Parser, SPLSyntaxError
 
 if __name__ == "__main__":
@@ -24,7 +25,10 @@ if __name__ == "__main__":
 
     args = arg_parser.parse_args()
 
-    spl_parser = Parser(args.input)
+    with open(args.input) as f:
+        spl_lexer = Lexer(f.read())
+
+    spl_parser = Parser(spl_lexer.token_generator())
 
     try:
         ast = spl_parser.play()

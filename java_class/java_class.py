@@ -53,23 +53,23 @@ class JavaClass(object):
     def check_valid(self):
         """
         Checks that the class is in a valid state for export.
-        :return: Tuple of ((bool) is_valid, (str) reason).
+        :return: None
+        :raises: InvalidClassError if the class was not valid.
         """
         if self.name is None:
-            return False, "Name should be set."
+            raise InvalidClassError("Name should be set.")
         if self.pool is None:
-            return False, "Pool table was not set."
+            raise InvalidClassError("Pool table was not set.")
         if self.methods is None:
-            return False, "Method table was not set."
+            raise InvalidClassError("Method table was not set.")
         if len(self.methods) == 0:
-            return False, "Method table was empty."
+            raise InvalidClassError("Method table was empty.")
         if self.fields is None:
-            return False, "Field table was not set."
+            raise InvalidClassError("Field table was not set.")
         if self.version is None or len(self.version) != 2:
-            return False, "Version should be a tuple of two items (major, minor)."
+            raise InvalidClassError("Version should be a tuple of two items (major, minor).")
         if self.access_modifiers is None:
-            return False, "Access modifiers not set."
-        return True, "OK"
+            raise InvalidClassError("Access modifiers not set.")
 
 
 class Field(object):
