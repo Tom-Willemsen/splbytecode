@@ -18,7 +18,7 @@ if __name__ == "__main__":
     arg_parser.add_argument('--cls-name', type=str,
                             help="Output class name.", default="SplProgram")
     arg_parser.add_argument('--cls-maj-version', type=int,
-                            help="Major version number of java output class.", default=53)
+                            help="Major version number of java output class.", default=50)
     arg_parser.add_argument('--cls-min-version', type=int,
                             help="Minor version number of java output class.", default=0)
 
