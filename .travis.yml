@@ -2,16 +2,23 @@ language: python
 jdk:
   - oraclejdk8
 python:
+  - "2.6"
+  - "2.7"
   - "3.2"
   - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
   - "3.7-dev"
+  - "pypy"
   - "pypy3"
 script:
   - python run_all_tests.py
-  - python compiler.py examples/hello.spl --cls-name Hello && java Hello
-  - python compiler.py examples/goto.spl --cls-name Goto && java Goto
-  - python compiler.py examples/incrementor.spl --cls-name Incrementor && java Incrementor 100
-  - python compiler.py examples/condgoto.spl --cls-name Condgoto && java Condgoto 15
+  - python compiler.py examples/hello.spl --cls-name Hello 
+  - java Hello
+  - python compiler.py examples/goto.spl --cls-name Goto 
+  - java Goto
+  - python compiler.py examples/incrementor.spl --cls-name Incrementor 
+  - java Incrementor 100
+  - python compiler.py examples/condgoto.spl --cls-name Condgoto 
+  - java Condgoto 15

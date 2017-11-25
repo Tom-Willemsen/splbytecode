@@ -20,6 +20,10 @@ def list_from_file(filename):
     return result
 
 
+def regex_from_words(words):
+    return "({})".format("|".join(words).replace(" ", "\s"))
+
+
 class Lexer(object):
     def __init__(self, text):
         self.text = text.lower()
@@ -54,15 +58,15 @@ class Lexer(object):
                 lambda: Token(TokenTypes.Input, False),
             "(let us proceed to |let us return to )":
                 lambda: Token(TokenTypes.Goto, text),
-            "({})".format("|".join(self.names)):
+            regex_from_words(self.names):
                 lambda: Token(TokenTypes.Name, text),
-            "({})".format("|".join(self.adjectives)):
+            regex_from_words(self.adjectives):
                 lambda: Token(TokenTypes.Adj, 2),
-            "({})".format("|".join(self.nouns)):
+            regex_from_words(self.nouns):
                 lambda: Token(TokenTypes.Noun, 1),
-            "({})".format("|".join(self.negative_nouns)):
+            regex_from_words(self.negative_nouns):
                 lambda: Token(TokenTypes.Noun, -1),
-            "(with|and)":
+            regex_from_words(["with", "and"]):
                 lambda: Token(TokenTypes.Add, operators.Operators.ADD),
             "(\.|!)":
                 lambda: Token(TokenTypes.EndLine),
@@ -90,8 +94,10 @@ class Lexer(object):
                 lambda: Token(TokenTypes.IfSo),
             " ([ivx]+)[.:]":
                 lambda: Token(TokenTypes.Numeral, text),
-            "(are|is|am) (?:{0}|{1}|{2}) ?(?:equal to) (?:{0}|{1}|{2})\?"
-                .format("|".join(FIRST_PERSON_PRONOUNS), "|".join(SECOND_PERSON_PRONOUNS), "|".join(self.names)):
+            "(are|is|am) ({0}|{1}|{2}) ?(?:equal to) (?:{0}|{1}|{2})\?"
+                .format(regex_from_words(FIRST_PERSON_PRONOUNS),
+                        regex_from_words(SECOND_PERSON_PRONOUNS),
+                        regex_from_words(self.names)):
                 lambda: Token(TokenTypes.QuestionStart),
         }
 
