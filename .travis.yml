@@ -3,5 +3,5 @@ jdk:
   - oraclejdk8
 python:
   - "3.6"
-install:
+script:
   - python run_all_tests.py
