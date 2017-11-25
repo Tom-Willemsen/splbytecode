@@ -1,7 +1,7 @@
 import unittest
 
-from spl.parser import Parser, SPLSyntaxError
-from spl.tokens import TokenTypes, Token
+from splbytecode.spl.parser import Parser, SPLSyntaxError
+from splbytecode.spl.tokens import TokenTypes, Token
 
 
 def _add_scene(tokens):

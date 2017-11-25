@@ -1,19 +1,23 @@
 import re
+import os
 
 from intermediate import operators
 from spl.tokens import Token, TokenTypes
 
 
-def list_from_file(filename):
-    result = []
-    with open(filename, "r") as f:
-        for line in f.readlines():
-            result.append(line.strip().lower())
-    return result
-
-
 FIRST_PERSON_PRONOUNS = ["i ", "myself"]
 SECOND_PERSON_PRONOUNS = ["you", "thyself"]
+
+WORDS_DIRECTORY = os.path.join(os.path.dirname(__file__), "words")
+
+
+def list_from_file(filename):
+    result = []
+    with open(os.path.join(WORDS_DIRECTORY, filename), "r") as f:
+        for line in f.readlines():
+            if line.strip() != "":
+                result.append(line.strip().lower())
+    return result
 
 
 class Lexer(object):
@@ -21,10 +25,10 @@ class Lexer(object):
         self.text = text.lower()
         self.pos = 0
 
-        self.names = list_from_file("spl/words/characters.txt")
-        self.nouns = list_from_file("spl/words/nouns.txt")
-        self.negative_nouns = list_from_file("spl/words/negative_nouns.txt")
-        self.adjectives = list_from_file("spl/words/adjectives.txt")
+        self.names = list_from_file("characters.txt")
+        self.nouns = list_from_file("nouns.txt")
+        self.negative_nouns = list_from_file("negative_nouns.txt")
+        self.adjectives = list_from_file("adjectives.txt")
 
     def token_generator(self):
         while self.pos < len(self.text):
@@ -59,7 +63,7 @@ class Lexer(object):
             "({})".format("|".join(self.negative_nouns)):
                 lambda: Token(TokenTypes.Noun, -1),
             "(with|and)":
-                lambda: Token(TokenTypes.Add, value=operators.Operators.ADD),
+                lambda: Token(TokenTypes.Add, operators.Operators.ADD),
             "(\.|!)":
                 lambda: Token(TokenTypes.EndLine),
             "(\?)":
