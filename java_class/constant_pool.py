@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from java_class.constant_pool_entry import utf8, class_ref, name_and_type, method_ref, field_ref
 
 

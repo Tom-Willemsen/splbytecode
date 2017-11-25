@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import re
 import os
 
@@ -19,7 +17,7 @@ def list_from_file(filename):
         for line in f.readlines():
             if line.strip() != "":
                 result.append(line.strip().lower())
-    return result
+    return sorted(result)  # Ensure consistent order, at least.
 
 
 def regex_from_words(words):

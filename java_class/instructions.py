@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from java_class.byte_utils import u1, u2, u4, s4, s1, s2
 
 

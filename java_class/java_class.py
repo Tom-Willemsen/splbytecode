@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from java_class import access_modifiers
 from java_class.constant_pool import ConstantPool
 from java_class.constant_pool_entry import utf8

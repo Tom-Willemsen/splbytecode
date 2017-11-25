@@ -2,15 +2,8 @@ language: python
 jdk:
   - oraclejdk8
 python:
-  - "2.6"
-  - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
   - "3.6"
   - "3.7-dev"
-  - "pypy"
   - "pypy3"
 script:
   - python run_all_tests.py
