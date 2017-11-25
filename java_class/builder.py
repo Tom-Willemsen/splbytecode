@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from intermediate import ast, operators
 from java_class import access_modifiers, instructions
 from java_class.java_class import JavaClass, InvalidClassError
