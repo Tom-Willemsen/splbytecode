@@ -54,10 +54,7 @@ class Exporter(object):
             stream.write(u2(field.access_flags))
             stream.write(u2(field.name_index))
             stream.write(u2(field.descriptor_index))
-
-            # Attributes table within field table
-            assert len(field.attributes) == 0, "Writing fields with attributes has not been implemented."
-            stream.write(u2(len(field.attributes)))
+            stream.write(u2(0))  # Writing fields with attributes has not been implemented.
 
         # Methods table
         stream.write(u2(len(self.output_class.methods)))
