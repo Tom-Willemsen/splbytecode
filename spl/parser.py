@@ -56,7 +56,7 @@ class Parser(object):
             return ast.DynamicValue(self.get_character_being_spoken_to())
         elif self.current_token.type == TokenTypes.FirstPronoun:
             self.eat(TokenTypes.FirstPronoun)
-            return ast.DynamicValue(self.get_character_being_spoken_to())
+            return ast.DynamicValue(self.speaking)
         else:
             return ast.Value(self.eat(TokenTypes.Noun))
 
