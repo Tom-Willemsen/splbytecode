@@ -19,13 +19,6 @@ L
 D
 ```
 
-Incrementing user input:
-```
-> python compiler.py incrementor.spl
-> java SplProgram 100
-101
-```
-
 Requires Python 3.6 and a JRE >= 5 (versions before 5 may work if you don't use any characters with spaces in their names). No need for a JDK.
 
 Note: A Java 9 class is produced by default. This can be configured using the `--cls-maj-version` compiler option. See [list of valid version numbers](https://stackoverflow.com/questions/9170832/list-of-java-class-file-format-major-version-numbers).
@@ -34,7 +27,6 @@ If you're running the `goto.spl` example you'll need to launch the JVM with the 
 
 
 Current deficiencies/TODOs:
-- Does not support conditional gotos
 - Each scene must have a well-defined set of characters on stage. All characters must leave at the end of a scene.
 - Characters are single-valued, stacks have not been implemented.
 - Arithmetic isn't supported yet (e.g. `You are the quotient of ... and ...`)
