@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Tom-Willemsen/splbytecode.svg?branch=master)](https://travis-ci.org/Tom-Willemsen/splbytecode)
+
 # splbytecode
 Shakespeare programming language to Java bytecode compiler.
 
