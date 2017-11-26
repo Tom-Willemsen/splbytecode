@@ -11,11 +11,4 @@ sudo: false
 dist: trusty
 script:
   - python run_unit_tests.py
-  - python spl_compiler.py examples/hello.spl --cls-name Hello
-  - java Hello
-  - python spl_compiler.py examples/goto.spl --cls-name Goto
-  - java Goto
-  - python spl_compiler.py examples/incrementor.spl --cls-name Incrementor
-  - java Incrementor 100
-  - python spl_compiler.py examples/condgoto.spl --cls-name Condgoto
-  - java Condgoto 15
+  - python run_integration_tests.py

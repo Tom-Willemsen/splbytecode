@@ -39,6 +39,10 @@ def remove_cr_and_lf(text):
 
 
 class IntegrationTests(unittest.TestCase):
+    """
+    These tests run the full compiler against the code in the "examples" directory and then execute the produced class,
+    asserting that the output is as expected.
+    """
 
     def test_GIVEN_hello_world_example_THEN_it_compiles_and_runs_without_error(self):
         filename = "hello.spl"
@@ -86,6 +90,7 @@ class IntegrationTests(unittest.TestCase):
 if __name__ == "__main__":
 
     # Clean up any leftover output from previous tests
+    # Don't do this immediately after running tests because the produced classes may be useful for debugging.
     if os.path.exists(TEMP_OUTPUT_DIR):
         shutil.rmtree(TEMP_OUTPUT_DIR)
 
