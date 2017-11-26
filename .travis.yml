@@ -1,6 +1,4 @@
 language: python
-jdk:
-  - oraclejdk8
 python:
   - "3.2"
   - "3.3"
@@ -9,6 +7,12 @@ python:
   - "3.6"
   - "3.7-dev"
   - "pypy3"
+sudo: false
+dist: trusty
+addons:
+  apt:
+    packages:
+      - oracle-java8-set-default
 script:
   - python run_all_tests.py
   - python compiler.py examples/hello.spl --cls-name Hello 
