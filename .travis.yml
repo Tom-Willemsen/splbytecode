@@ -1,6 +1,4 @@
 language: python
-jdk:
-  - oraclejdk8
 python:
   - "3.2"
   - "3.3"
@@ -9,13 +7,13 @@ python:
   - "3.6"
   - "3.7-dev"
   - "pypy3"
+sudo: false
+dist: trusty
 script:
-  - python run_all_tests.py
-  - python compiler.py examples/hello.spl --cls-name Hello 
+  # Unit tests
+  - python run_unit_tests.py
+  # Integration tests
+  - python run_integration_tests.py
+  # Sanity check that command line syntax works
+  - python splbytecode.py examples/hello.spl --cls-name Hello
   - java Hello
-  - python compiler.py examples/goto.spl --cls-name Goto 
-  - java Goto
-  - python compiler.py examples/incrementor.spl --cls-name Incrementor 
-  - java Incrementor 100
-  - python compiler.py examples/condgoto.spl --cls-name Condgoto 
-  - java Condgoto 15

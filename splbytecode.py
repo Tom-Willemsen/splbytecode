@@ -8,6 +8,22 @@ from java_class.exporter import Exporter
 from spl.lexer import Lexer
 from spl.parser import Parser, SPLSyntaxError
 
+
+def main(input_file, output_dir, cls_name, cls_maj_version, cls_min_version):
+    with open(input_file) as f:
+        spl_lexer = Lexer(f.read())
+
+    spl_parser = Parser(spl_lexer.token_generator())
+
+    ast = spl_parser.play()
+    asl = flatten_ast(ast)
+
+    cls = Builder(cls_name).asl_dump(asl).build()
+    cls.set_version(cls_maj_version, cls_min_version)
+
+    Exporter(cls).export_as_file(output_dir)
+
+
 if __name__ == "__main__":
 
     arg_parser = argparse.ArgumentParser(description='Shakespeare programming language to java bytecode compiler.',
@@ -25,23 +41,16 @@ if __name__ == "__main__":
 
     args = arg_parser.parse_args()
 
-    with open(args.input) as f:
-        spl_lexer = Lexer(f.read())
-
-    spl_parser = Parser(spl_lexer.token_generator())
-
     try:
-        ast = spl_parser.play()
-        asl = flatten_ast(ast)
+        main(args.input, args.output_dir, args.cls_name, args.cls_maj_version, args.cls_min_version)
     except SPLSyntaxError as e:
         print("Syntax error: {}".format(e))
         sys.exit(1)
-
-    try:
-        cls = Builder(args.cls_name).asl_dump(asl).build()
-        cls.set_version(args.cls_maj_version, args.cls_min_version)
     except CompilationError as e:
         print("Compiler error: {}".format(e))
-        sys.exit(1)
+        sys.exit(2)
+    except Exception as e:
+        print("Unknown error: {}".format(e))
+        sys.exit(3)
 
-    Exporter(cls).export_as_file(args.output_dir)
+    sys.exit(0)
