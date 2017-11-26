@@ -12,7 +12,7 @@ dist: trusty
 addons:
   apt:
     packages:
-      - oracle-java8-set-default
+      - oracle-java9-set-default
 script:
   - python run_all_tests.py
   - python compiler.py examples/hello.spl --cls-name Hello 
