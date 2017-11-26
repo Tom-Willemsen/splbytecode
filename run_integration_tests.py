@@ -31,7 +31,15 @@ def run_java(class_name, *args):
 
     command = ["java", "-cp", TEMP_OUTPUT_DIR, class_name] + [str(a) for a in args]
 
-    return subprocess.check_output(command, stderr=subprocess.STDOUT, timeout=10).decode()
+    try:
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, timeout=10)
+    except TypeError as e:
+        if "unexpected keyword argument 'timeout'" not in str(e):
+            raise
+        # Python 3.2 doesn't support timeout. So try again without one.
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+    
+    return output.decode()
 
 
 def remove_cr_and_lf(text):
