@@ -8,16 +8,15 @@ class InvalidClassError(Exception):
 
 
 class JavaClass(object):
-    def __init__(self, name, use_defaults=True):
+    def __init__(self, name):
         self.name = name
 
-        if use_defaults:
-            self.pool = ConstantPool.generate_default(name)
-            self.methods = []
-            self.fields = []
+        self.pool = ConstantPool.generate_default(name)
+        self.methods = []
+        self.fields = []
 
-            self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
-            self.version = (50, 0)  # JDK 9 by default
+        self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
+        self.version = None
 
     def set_version(self, major, minor=0):
         self.version = (major, minor)
