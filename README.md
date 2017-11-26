@@ -21,7 +21,7 @@ L
 D
 ```
 
-Requires Python 3.6 and a JRE >= 5. No need for a JDK.
+Requires Python 3 and a JRE >= 5. No need for a JDK.
 
 A class file at version 50.0 (JRE 6) is produced by default. This can be configured using the `--cls-maj-version` and `--cls-min-version` compiler options. See [list of valid version numbers](https://stackoverflow.com/questions/9170832/list-of-java-class-file-format-major-version-numbers). 
 
