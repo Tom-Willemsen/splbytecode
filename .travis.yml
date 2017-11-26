@@ -10,12 +10,12 @@ python:
 sudo: false
 dist: trusty
 script:
-  - python run_all_tests.py
-  - python compiler.py examples/hello.spl --cls-name Hello 
+  - python run_unit_tests.py
+  - python spl_compiler.py examples/hello.spl --cls-name Hello
   - java Hello
-  - python compiler.py examples/goto.spl --cls-name Goto 
+  - python spl_compiler.py examples/goto.spl --cls-name Goto
   - java Goto
-  - python compiler.py examples/incrementor.spl --cls-name Incrementor 
+  - python spl_compiler.py examples/incrementor.spl --cls-name Incrementor
   - java Incrementor 100
-  - python compiler.py examples/condgoto.spl --cls-name Condgoto 
+  - python spl_compiler.py examples/condgoto.spl --cls-name Condgoto
   - java Condgoto 15

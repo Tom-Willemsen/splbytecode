@@ -22,6 +22,9 @@ class Exporter(object):
         Writes the contents of a .java_class file with the same name
         as the java_class in the order specified by the specification.
         """
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
         filename = os.path.join(output_dir, "{}.class".format(self.output_class.name))
 
         with open(filename, "w+b") as f:
