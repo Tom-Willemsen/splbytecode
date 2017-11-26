@@ -1,5 +1,4 @@
 from intermediate import ast, operators
-from spl.lexer import Lexer
 from spl.tokens import TokenTypes
 
 
@@ -8,8 +7,8 @@ class SPLSyntaxError(Exception):
 
 
 class Parser(object):
-    def __init__(self, filepath):
-        self.tokens = Lexer(open(filepath).read()).token_generator()
+    def __init__(self, tokens):
+        self.tokens = tokens
         self.current_token = None
         self.next_token()
 
@@ -20,7 +19,10 @@ class Parser(object):
         self.current_act = None  # ID of current act. None = not in an act yet.
 
     def next_token(self):
-        self.current_token = next(self.tokens, None)
+        try:
+            self.current_token = next(self.tokens)
+        except StopIteration:
+            raise SPLSyntaxError("Next token was requested, but none exists.")
         return self.current_token
 
     def eat(self, token_type):
@@ -150,22 +152,29 @@ class Parser(object):
 
     def enter(self):
         self.eat(TokenTypes.Enter)
-        self.onstage.append(self.eat(TokenTypes.Name))
+        self.enter_single()
         while self.current_token.type == TokenTypes.Add:
             self.eat(TokenTypes.Add)
-            self.onstage.append(self.eat(TokenTypes.Name))
+            self.enter_single()
+
+    def enter_single(self):
+        name = self.eat(TokenTypes.Name)
+        if name in self.onstage:
+            raise SPLSyntaxError("Character '{}' cannot enter as they are already on stage".format(name))
+        self.onstage.append(name)
 
     def exit(self):
-        def leave(name):
-            if name not in self.onstage:
-                raise SPLSyntaxError("Character '{}' cannot leave if they are not on stage.".format(name))
-            self.onstage.remove(name)
-
         self.eat(TokenTypes.Exit)
-        leave(self.eat(TokenTypes.Name))
+        self.exit_single()
         while self.current_token.type == TokenTypes.Add:
             self.eat(TokenTypes.Add)
-            leave(self.eat(TokenTypes.Name))
+            self.exit_single()
+
+    def exit_single(self):
+        name = self.eat(TokenTypes.Name)
+        if name not in self.onstage:
+            raise SPLSyntaxError("Character '{}' cannot leave if they are not on stage.".format(name))
+        self.onstage.remove(name)
 
     def exeunt(self):
         self.eat(TokenTypes.Exeunt)

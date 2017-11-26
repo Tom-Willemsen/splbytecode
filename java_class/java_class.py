@@ -1,5 +1,4 @@
 from java_class import access_modifiers
-from java_class.byte_utils import u2
 from java_class.constant_pool import ConstantPool
 from java_class.constant_pool_entry import utf8
 
@@ -9,16 +8,15 @@ class InvalidClassError(Exception):
 
 
 class JavaClass(object):
-    def __init__(self, name, use_defaults=True):
+    def __init__(self, name):
         self.name = name
 
-        if use_defaults:
-            self.pool = ConstantPool.generate_default(name)
-            self.methods = []
-            self.fields = []
+        self.pool = ConstantPool.generate_default(name)
+        self.methods = []
+        self.fields = []
 
-            self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
-            self.version = (50, 0)  # JDK 9 by default
+        self.access_modifiers = [access_modifiers.PUBLIC, access_modifiers.SUPER]
+        self.version = None
 
     def set_version(self, major, minor=0):
         self.version = (major, minor)
@@ -53,23 +51,23 @@ class JavaClass(object):
     def check_valid(self):
         """
         Checks that the class is in a valid state for export.
-        :return: Tuple of ((bool) is_valid, (str) reason).
+        :return: None
+        :raises: InvalidClassError if the class was not valid.
         """
         if self.name is None:
-            return False, "Name should be set."
+            raise InvalidClassError("Name should be set.")
         if self.pool is None:
-            return False, "Pool table was not set."
+            raise InvalidClassError("Pool table was not set.")
         if self.methods is None:
-            return False, "Method table was not set."
+            raise InvalidClassError("Method table was not set.")
         if len(self.methods) == 0:
-            return False, "Method table was empty."
+            raise InvalidClassError("Method table was empty.")
         if self.fields is None:
-            return False, "Field table was not set."
+            raise InvalidClassError("Field table was not set.")
         if self.version is None or len(self.version) != 2:
-            return False, "Version should be a tuple of two items (major, minor)."
+            raise InvalidClassError("Version should be a tuple of two items (major, minor).")
         if self.access_modifiers is None:
-            return False, "Access modifiers not set."
-        return True, "OK"
+            raise InvalidClassError("Access modifiers not set.")
 
 
 class Field(object):
