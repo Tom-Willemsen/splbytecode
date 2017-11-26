@@ -1,6 +1,7 @@
 import sys
 import unittest
 
+from java_class.tests.test_constant_pool import ConstantPoolTests
 from java_class.tests.test_java_class import JavaClassTests
 from spl.tests.test_lexer import LexerTests
 from spl.tests.test_parser import ParserTests
@@ -13,6 +14,7 @@ if __name__ == "__main__":
         ParserTests,
         LexerTests,
         JavaClassTests,
+        ConstantPoolTests,
     ]
 
     ret_vals = []
