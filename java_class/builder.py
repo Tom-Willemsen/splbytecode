@@ -50,11 +50,6 @@ class Builder(object):
 
         self.output_class.add_method("main", "([Ljava/lang/String;)V", Builder.MAIN_METHOD_ACCESS_MODIFIERS, code)
 
-        try:
-            self.output_class.check_valid()
-        except InvalidClassError as e:
-            raise CompilationError("Can't build class: {}".format(e))
-
         return self.output_class
 
     @staticmethod
