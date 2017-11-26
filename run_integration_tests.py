@@ -52,7 +52,7 @@ class IntegrationTests(unittest.TestCase):
 
         output = remove_cr_and_lf(run_java(class_name))
 
-        self.assertEqual("HELLO, WORLD", output)
+        self.assertIn("HELLO, WORLD", output)
 
     def test_GIVEN_incrementor_example_THEN_it_compiles_and_runs_without_error(self):
         filename = "incrementor.spl"
@@ -60,9 +60,9 @@ class IntegrationTests(unittest.TestCase):
 
         compile_spl(filename, class_name)
 
-        output = remove_cr_and_lf(run_java(class_name, 100))
+        output = remove_cr_and_lf(run_java(class_name, 12321))
 
-        self.assertEqual("101", output)
+        self.assertIn("12322", output)
 
     def test_GIVEN_goto_example_THEN_it_compiles_and_runs_without_error(self):
         filename = "goto.spl"
@@ -72,7 +72,7 @@ class IntegrationTests(unittest.TestCase):
 
         output = remove_cr_and_lf(run_java(class_name))
 
-        self.assertEqual("1", output)
+        self.assertIn("1", output)
 
     def test_GIVEN_conditional_goto_example_THEN_it_compiles_and_runs_without_error(self):
         filename = "condgoto.spl"
@@ -84,7 +84,7 @@ class IntegrationTests(unittest.TestCase):
 
         expected_output = "".join(str(n) for n in range(1, 16))
 
-        self.assertEqual(expected_output, output)
+        self.assertIn(expected_output, output)
 
 
 if __name__ == "__main__":

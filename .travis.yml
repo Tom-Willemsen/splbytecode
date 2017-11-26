@@ -10,5 +10,10 @@ python:
 sudo: false
 dist: trusty
 script:
+  # Unit tests
   - python run_unit_tests.py
+  # Integration tests
   - python run_integration_tests.py
+  # Sanity check that command line syntax works
+  - python splbytecode.py examples/hello.spl --cls-name Hello
+  - java Hello
