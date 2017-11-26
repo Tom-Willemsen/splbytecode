@@ -21,7 +21,7 @@ def list_from_file(filename):
 
 
 def regex_from_words(words):
-    return "({})".format("|".join(words).replace(" ", "\s"))
+    return "({})".format("|".join(words))
 
 
 class Lexer(object):
@@ -94,10 +94,11 @@ class Lexer(object):
                 lambda: Token(TokenTypes.IfSo),
             " ([ivx]+)[.:]":
                 lambda: Token(TokenTypes.Numeral, text),
-            "(are|is|am) ({0}|{1}|{2}) ?(?:equal to) (?:{0}|{1}|{2})\?"
-                .format(regex_from_words(FIRST_PERSON_PRONOUNS),
-                        regex_from_words(SECOND_PERSON_PRONOUNS),
-                        regex_from_words(self.names)):
+            "(are|is|am) (?:{0}|{1}|{2}) ?(?:equal to) ?(?:{0}|{1}|{2})\?".format(
+                regex_from_words(FIRST_PERSON_PRONOUNS),
+                regex_from_words(SECOND_PERSON_PRONOUNS),
+                regex_from_words(self.names)
+                ):
                 lambda: Token(TokenTypes.QuestionStart),
         }
 
@@ -111,7 +112,8 @@ class Lexer(object):
             return Token(TokenTypes.NoOp)
 
     def text_starts_with_regex(self, rx):
-        match = re.search("^{}".format(rx), self.text[self.pos:])
+        regex = "^{}".format(rx)
+        match = re.search(regex, self.text[self.pos:])
         if match:
             try:
                 return True, match.group(1)
