@@ -4,6 +4,8 @@ import os
 
 import shutil
 
+from math import sqrt
+
 import splbytecode
 import subprocess
 
@@ -93,6 +95,26 @@ class IntegrationTests(unittest.TestCase):
         expected_output = "".join(str(n) for n in range(1, 16))
 
         self.assertIn(expected_output, output)
+
+    def test_GIVEN_prime_test_example_THEN_it_compiles_and_runs_without_error(self):
+        filename = "prime.spl"
+        class_name = class_name_from_filename(filename)
+
+        compile_spl(filename, class_name)
+
+        def is_prime(n):
+            for divisor in range(2, int(sqrt(n)) + 1):
+                if n % divisor == 0:
+                    return False
+            return True
+
+        for n in range(2, 100):
+            output = remove_cr_and_lf(run_java(class_name, n))
+
+            expected_output = "-1" if is_prime(n) else "1"
+
+            self.assertEqual(expected_output, output,
+                             "failed on n={}, spl says {}, python says {}".format(n, output, is_prime(n)))
 
 
 if __name__ == "__main__":

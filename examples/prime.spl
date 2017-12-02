@@ -1,0 +1,81 @@
+A primality test.
+
+Romeo, a goat.          # trial_number
+Juliet, a lady.         # number
+Lady Macbeth, a woman.  # a
+Hamlet, a man.          # b
+
+Act I: Getting input.
+
+Scene I: Getting input.
+
+[Enter Romeo and Juliet]
+Romeo: Listen to your heart!
+Romeo: Let us proceed to act II.
+[Exeunt]
+
+Act II: act ii.
+
+Scene I: scene i.
+
+[Enter Romeo and Lady Macbeth]
+Lady Macbeth: You are a king!
+[Exeunt]
+
+Scene II: scene ii.
+
+[Enter Romeo and Juliet]
+Romeo: Am I equal to Juliet?
+Juliet: If so, let us proceed to act III.
+[Exit Juliet]
+[Enter Lady Macbeth]
+Lady Macbeth: I am romeo!
+Lady Macbeth: Hamlet is a king.
+[Exeunt]
+
+Scene III: while hamlet is not equal to Juliet.
+[Enter Hamlet and Juliet]
+Hamlet: Am I equal to thyself?
+Juliet: If so, let us proceed to scene IV.
+[Exeunt]
+
+[Enter Lady Macbeth and Juliet]
+Juliet: Am I equal to thyself?
+Lady Macbeth: If so, let us proceed to Act IV.
+Juliet: You are thyself and Romeo!
+Lady Macbeth: Hamlet is Hamlet with a virgin!
+Juliet: Let us return to scene III.
+[Exeunt]
+
+Scene IV: romeo plus equals one.
+[Enter Romeo and Juliet]
+Juliet: You are thyself and a king!
+Romeo: Let us return to scene II.
+[Exeunt]
+
+Act III: act iii.
+
+Scene I: printing the answer if it was prime.
+
+[Enter Romeo and Lady Macbeth]
+Romeo: You are a pig!
+Romeo: Open your heart!
+Romeo: Let us proceed to act V.
+[Exeunt] 
+
+Act IV: act iv.
+
+Scene I: printing the answer if it was not prime.
+
+[Enter Romeo and Lady Macbeth]
+Romeo: You are a king!
+Romeo: Open your heart!
+Romeo: Let us proceed to act V.
+[Exeunt] 
+
+Act V: act v.
+
+Scene I: The end.
+
+[Enter Romeo and Lady Macbeth]
+[Exeunt] 
