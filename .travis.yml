@@ -10,7 +10,7 @@ python:
 sudo: false
 dist: trusty
 before_script:
- - export JAVA_OPTS="-Xmx32m -Xms16m"
+ - export _JAVA_OPTIONS="-Xmx32m -Xms16m"
 script:
   # Unit tests
   - python run_unit_tests.py
