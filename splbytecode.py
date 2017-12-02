@@ -9,7 +9,7 @@ from spl.lexer import Lexer
 from spl.parser import Parser, SPLSyntaxError
 
 
-def main(input_file, output_dir, cls_name, cls_maj_version, cls_min_version):
+def main(input_file, output_dir, cls_name, cls_maj_version, cls_min_version, jar):
     with open(input_file) as f:
         spl_lexer = Lexer(f.read())
 
@@ -21,7 +21,12 @@ def main(input_file, output_dir, cls_name, cls_maj_version, cls_min_version):
     cls = Builder(cls_name).asl_dump(asl).build()
     cls.set_version(cls_maj_version, cls_min_version)
 
-    Exporter(cls).export_as_file(output_dir)
+    exporter = Exporter(cls)
+
+    if jar:
+        exporter.export_as_jar(output_dir)
+    else:
+        exporter.export_as_file(output_dir)
 
 
 if __name__ == "__main__":
@@ -31,18 +36,20 @@ if __name__ == "__main__":
     arg_parser.add_argument('input', type=str,
                             help="File path to the SPL input file.")
     arg_parser.add_argument('--output-dir', type=str,
-                            help="Output directory.", default=os.getcwd())
+                            help="Output directory.", default=os.path.join(os.getcwd(), "bin"))
     arg_parser.add_argument('--cls-name', type=str,
                             help="Output class name.", default="SplProgram")
     arg_parser.add_argument('--cls-maj-version', type=int,
                             help="Major version number of java output class.", default=50)
     arg_parser.add_argument('--cls-min-version', type=int,
                             help="Minor version number of java output class.", default=0)
+    arg_parser.add_argument('--jar', action='store_true',
+                            help="Output as a .jar file instead of a .class file")
 
     args = arg_parser.parse_args()
 
     try:
-        main(args.input, args.output_dir, args.cls_name, args.cls_maj_version, args.cls_min_version)
+        main(args.input, args.output_dir, args.cls_name, args.cls_maj_version, args.cls_min_version, args.jar)
     except SPLSyntaxError as e:
         print("Syntax error: {}".format(e))
         sys.exit(1)

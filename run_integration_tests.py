@@ -38,7 +38,7 @@ def run_java(class_name, *args):
             raise
         # Python 3.2 doesn't support timeout. So try again without one.
         output = subprocess.check_output(command, stderr=subprocess.STDOUT)
-    
+
     return output.decode()
 
 

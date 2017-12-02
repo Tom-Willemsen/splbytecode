@@ -1,6 +1,9 @@
 import operator
-import os
 from functools import reduce
+from zipfile import ZipFile
+import os
+
+import shutil
 
 from java_class.byte_utils import u4, u2
 
@@ -17,18 +20,48 @@ class Exporter(object):
         output_class.check_valid()
         self.output_class = output_class
 
+    def get_class_file_name(self):
+        return "{}.class".format(self.output_class.name)
+
+    def get_class_file_path(self, output_dir):
+        return os.path.normpath(os.path.join(output_dir, self.get_class_file_name()))
+
     def export_as_file(self, output_dir):
         """
-        Writes the contents of a .java_class file with the same name
+        Writes the contents of a .class file with the same name
         as the java_class in the order specified by the specification.
         """
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
 
-        filename = os.path.join(output_dir, "{}.class".format(self.output_class.name))
+        filepath = self.get_class_file_path(output_dir)
 
-        with open(filename, "w+b") as f:
+        if not os.path.exists(os.path.dirname(filepath)):
+            os.makedirs(os.path.dirname(filepath))
+
+        with open(filepath, "w+b") as f:
             self._write(f)
+
+    def export_as_jar(self, output_dir):
+
+        self.export_as_file(output_dir)
+
+        manifest_dir = os.path.join(output_dir, "META-INF")
+        manifest_path = os.path.join(manifest_dir, "MANIFEST.MF")
+
+        os.mkdir(manifest_dir)
+
+        with open(manifest_path, "w") as f:
+            f.write('Manifest-Version: 1.0\nCreated-By: spl\nMain-Class: {}\n'.format(self.output_class.name))
+
+        with ZipFile(os.path.join(output_dir, "{}.jar".format(self.output_class.name)), "w") as f:
+
+            f.write(manifest_path, arcname=os.path.join("META-INF", "MANIFEST.MF"))
+
+            f.write(self.get_class_file_path(output_dir), arcname=self.get_class_file_name())
+            f.write(self.get_class_file_path(output_dir),
+                    arcname=os.path.join(self.output_class.name.lower(), self.get_class_file_name()))
+
+        os.remove(self.get_class_file_path(output_dir))
+        shutil.rmtree(manifest_dir)
 
     def _write(self, stream):
         # Java java_class file header (constant bytes + versions).
