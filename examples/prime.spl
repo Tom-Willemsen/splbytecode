@@ -1,0 +1,80 @@
+Take an integer argument greater or equal to two and print minus one if it was prime, one if it is composite.
+
+Romeo, a fat miserable old man.
+Juliet, a sweet young lady.
+Lady Macbeth, an angel.
+Hamlet, a villainous cowardly bastard.
+
+Act I: Getting input.
+
+Scene I: Reading input from the user.
+
+[Enter Romeo and Juliet]
+Romeo: Listen to your heart!
+[Exeunt]
+
+Act II: The calculation proceeds.
+
+Scene I: Setting the scene.
+
+[Enter Romeo and Lady Macbeth]
+Lady Macbeth: You are a king!
+[Exeunt]
+
+Scene II: Incrementing a trial divisor.
+
+[Enter Romeo and Juliet]
+Romeo: Am I equal to thyself?
+Juliet: If so, let us proceed to act III.
+[Exit Juliet]
+[Enter Lady Macbeth]
+Lady Macbeth: I am romeo!
+Lady Macbeth: Hamlet is a king.
+[Exeunt]
+
+Scene III: Testing divisibility.
+
+[Enter Hamlet and Juliet]
+Hamlet: Am I equal to thyself?
+Juliet: If so, let us proceed to scene IV.
+[Exit Hamlet]
+[Enter Lady Macbeth]
+Juliet: Am I equal to thyself?
+Lady Macbeth: If so, let us proceed to Act IV.
+Juliet: You are thyself and Romeo!
+Lady Macbeth: Hamlet is Hamlet with his son!
+Juliet: Let us return to scene III.
+[Exeunt]
+
+Scene IV: Looping around.
+
+[Enter Romeo and Juliet]
+Juliet: You are a lover and thyself!
+Romeo: Let us return to scene II.
+[Exeunt]
+
+Act III: The answer was prime!
+
+Scene I: Printing the answer if it was prime.
+
+[Enter Romeo and Lady Macbeth]
+Romeo: You are a coward!
+Romeo: Open your heart!
+Lady Macbeth: Let us proceed to act V.
+[Exeunt] 
+
+Act IV: The answer was not prime!
+
+Scene I: Printing the answer if it was not prime.
+
+[Enter Romeo and Lady Macbeth]
+Romeo: You are a flatterer!
+Romeo: Open your heart!
+[Exeunt] 
+
+Act V: The end.
+
+Scene I: Fin.
+
+[Enter Romeo and Lady Macbeth]
+[Exeunt] 
