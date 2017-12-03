@@ -46,7 +46,7 @@ def run_java(class_name, *args):
 
 def remove_junk_line(text):
     if text.split(os.linesep)[0].startswith("Picked up _JAVA_OPTIONS:"):
-        return "".join(text.split(os.linesep)[1:])
+        return os.linesep.join(text.split(os.linesep)[1:])
     return text
 
 
