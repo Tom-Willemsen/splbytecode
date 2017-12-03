@@ -86,9 +86,9 @@ class IntegrationTests(unittest.TestCase):
 
         compile_spl(filename, class_name)
 
-        output = remove_junk_line(run_java(class_name))
+        output = "".join(remove_junk_line(run_java(class_name)))
 
-        self.assertEqual("1" + os.linesep, output)
+        self.assertEqual("1", output)
 
     def test_GIVEN_conditional_goto_example_THEN_it_compiles_and_runs_without_error(self):
         filename = "condgoto.spl"
@@ -96,9 +96,9 @@ class IntegrationTests(unittest.TestCase):
 
         compile_spl(filename, class_name)
 
-        output = remove_junk_line(run_java(class_name, 15))
+        output = "".join(remove_junk_line(run_java(class_name, 15)))
 
-        expected_output = os.linesep.join(str(n) for n in range(1, 16)) + os.linesep
+        expected_output = "".join(str(n) for n in range(1, 16))
 
         self.assertEqual(expected_output, output)
 
